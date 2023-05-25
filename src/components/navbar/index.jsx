@@ -7,10 +7,16 @@ import { FiSearch } from "react-icons/fi";
 // import { RiMoonFill, RiSunFill } from "react-icons/ri";
 import { IoMdNotificationsOutline } from "react-icons/io";
 import avatar from "assets/img/avatars/avatar4.png";
+import { CookieStorage, CookieKeys } from "utils/cookies";
 
 const Navbar = (props) => {
   const { onOpenSidenav, brandText } = props;
   // const [darkmode, setDarkmode] = React.useState(false);
+
+  const handleLogout = () => {
+    CookieStorage.remove(CookieKeys.AuthToken);
+    window.location.reload();
+  };
 
   return (
     <nav className="sticky top-4 z-40 flex flex-row flex-wrap items-center justify-between rounded-xl bg-white/10 p-2 backdrop-blur-xl dark:bg-[#0b14374d]">
@@ -135,7 +141,7 @@ const Navbar = (props) => {
             />
           }
           children={
-            <div className="flex h-48 w-56 flex-col justify-start rounded-[20px] bg-white bg-cover bg-no-repeat shadow-xl shadow-shadow-500 dark:!bg-navy-700 dark:text-white dark:shadow-none">
+            <div className="flex h-32 w-56 flex-col justify-start rounded-[20px] bg-white bg-cover bg-no-repeat shadow-xl shadow-shadow-500 dark:!bg-navy-700 dark:text-white dark:shadow-none">
               <div className="ml-4 mt-3">
                 <div className="flex items-center gap-2">
                   <p className="text-sm font-bold text-navy-700 dark:text-white">
@@ -146,7 +152,7 @@ const Navbar = (props) => {
               <div className="mt-3 h-px w-full bg-gray-200 dark:bg-white/20 " />
 
               <div className="ml-4 mt-3 flex flex-col">
-                <a
+                {/* <a
                   href=" "
                   className="text-sm text-gray-800 dark:text-white hover:dark:text-white"
                 >
@@ -157,13 +163,13 @@ const Navbar = (props) => {
                   className="mt-3 text-sm text-gray-800 dark:text-white hover:dark:text-white"
                 >
                   Newsletter Settings
-                </a>
-                <a
-                  href=" "
-                  className="mt-3 text-sm font-medium text-red-500 hover:text-red-500"
+                </a> */}
+                <div
+                  className="mt-3 cursor-pointer text-sm font-medium text-red-500 hover:text-red-500"
+                  onClick={handleLogout}
                 >
                   Log Out
-                </a>
+                </div>
               </div>
             </div>
           }
