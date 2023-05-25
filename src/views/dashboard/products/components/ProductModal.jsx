@@ -74,7 +74,7 @@ const ProductModal = (props) => {
     >
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>ADD PRODUCT</ModalHeader>
+        <ModalHeader>{defaultValue?.id ? "EDIT" : "ADD"} PRODUCT</ModalHeader>
         <ModalCloseButton onClick={handleCancel} />
         <hr />
         <ModalBody>

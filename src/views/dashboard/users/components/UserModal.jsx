@@ -65,7 +65,7 @@ const UserModal = (props) => {
     >
       <ModalOverlay />
       <ModalContent>
-        <ModalHeader>ADD USER</ModalHeader>
+        <ModalHeader>{defaultValue?.id ? "EDIT" : "ADD"} USER</ModalHeader>
         <ModalCloseButton onClick={handleCancel} />
         <hr />
         <ModalBody>
