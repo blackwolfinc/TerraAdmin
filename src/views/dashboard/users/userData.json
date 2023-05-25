@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "username": "Superadmin",
+    "password": "superadmin1234",
+    "role": "superadmin"
+  },
+  {
+    "id": 2,
+    "username": "Admin",
+    "password": "admin1234",
+    "role": "admin"
+  },
+  {
+    "id": 3,
+    "username": "Admin",
+    "password": "admin1234",
+    "role": "admin"
+  },
+  {
+    "id": 4,
+    "username": "Admin",
+    "password": "admin1234",
+    "role": "admin"
+  },
+  {
+    "id": 5,
+    "username": "Admin",
+    "password": "admin1234",
+    "role": "admin"
+  },
+  {
+    "id": 6,
+    "username": "Admin",
+    "password": "admin1234",
+    "role": "admin"
+  }
+]
