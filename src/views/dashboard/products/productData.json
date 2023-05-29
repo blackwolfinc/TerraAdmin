@@ -1,0 +1,53 @@
+[
+  {
+    "id": 1,
+    "title": "Rumah Satu",
+    "description": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
+    "specification": [
+      "Kamar Tidur : 3",
+      "Kamar Mandi : 2",
+      "Luas Bangunan : 40",
+      "Luas Tanah : 76"
+    ],
+    "sketch": "https://1.bp.blogspot.com/-H4Taaqkz1oo/XYnNWzvsTHI/AAAAAAAA5yA/DoXxOreIJYYKLo4ea7KfrcVfCLEfoDMWACLcBGAsYHQ/w640-h344/Denah%2Brumah%2Bminimalis%2Btype%2B36%2B1.jpg",
+    "images": [
+      "https://citramaja.com/wp-content/uploads/2019/04/cluster-sanur-dahlia.jpg",
+      "https://citramaja.com/wp-content/uploads/2019/04/cluster-sanur-dahlia.jpg",
+      "https://citramaja.com/wp-content/uploads/2019/04/cluster-sanur-soka.jpg"
+    ]
+  },
+  {
+    "id": 2,
+    "title": "Rumah Dua",
+    "description": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
+    "specification": [
+      "Kamar Tidur : 2",
+      "Kamar Mandi : 1",
+      "Luas Bangunan : 36",
+      "Luas Tanah : 60"
+    ],
+    "sketch": "https://goldencikeas.com/wp-content/uploads/2021/05/Semeru-denah-768x1086.jpg",
+    "images": [
+      "https://citramaja.com/wp-content/uploads/2019/04/cluster-sanur-soka.jpg",
+      "https://citramaja.com/wp-content/uploads/2019/04/cluster-sanur-soka.jpg",
+      "https://citramaja.com/wp-content/uploads/2019/04/cluster-sanur-soka.jpg"
+    ]
+  },
+  {
+    "id": 3,
+    "title": "Rumah Tiga",
+    "description": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
+    "specification": [
+      "Kamar Tidur : 2",
+      "Kamar Mandi : 1",
+      "Luas Bangunan : 32",
+      "Luas Tanah : 54"
+    ],
+    "sketch": "https://www.lamudi.co.id/journal/wp-content/uploads/2021/04/denah-type-3060.jpg",
+    "images": [
+      "https://citramaja.com/wp-content/uploads/2019/04/cluster-sanur-kana.jpg",
+      "https://citramaja.com/wp-content/uploads/2019/04/cluster-sanur-kana.jpg",
+      "https://citramaja.com/wp-content/uploads/2019/04/cluster-sanur-kana.jpg"
+    ]
+  }
+]
