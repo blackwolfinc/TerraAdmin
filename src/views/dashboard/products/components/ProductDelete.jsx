@@ -23,6 +23,7 @@ const ProductDelete = (props) => {
       <ModalOverlay />
       <ModalContent>
         <ModalHeader className="text-center">Konfirmasi Hapus</ModalHeader>
+        <hr />
         <ModalBody className="text-center">
           Apakah Anda yakin ingin manghapus produk "{data?.title}"?
         </ModalBody>
