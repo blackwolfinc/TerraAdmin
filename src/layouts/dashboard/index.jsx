@@ -3,6 +3,7 @@ import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import Navbar from "components/navbar";
 import Sidebar from "components/sidebar";
 import dashboardRoutes from "routers/dashboardRoutes.js";
+import { IsLoggedIn } from "utils/isAlreadyLoginChecker";
 
 export default function DashboardLayout(props) {
   const { ...rest } = props;
@@ -15,6 +16,7 @@ export default function DashboardLayout(props) {
       window.innerWidth < 1200 ? setOpen(false) : setOpen(true)
     );
   }, []);
+
   React.useEffect(() => {
     getActiveRoute(dashboardRoutes);
   }, [location.pathname]);
@@ -32,6 +34,7 @@ export default function DashboardLayout(props) {
     }
     return activeRoute;
   };
+
   const getActiveNavbar = (routes) => {
     let activeNavbar = false;
     for (let i = 0; i < routes.length; i++) {
@@ -43,6 +46,7 @@ export default function DashboardLayout(props) {
     }
     return activeNavbar;
   };
+
   const getRoutes = (routes) => {
     return routes.map((prop, key) => {
       if (prop.layout === "/dashboard") {
@@ -54,6 +58,10 @@ export default function DashboardLayout(props) {
       }
     });
   };
+
+  if (!IsLoggedIn()) {
+    return <Navigate to="/auth/login" replace />;
+  }
 
   document.documentElement.dir = "ltr";
 

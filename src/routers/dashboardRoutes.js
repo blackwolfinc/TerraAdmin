@@ -8,9 +8,6 @@ import Products from "views/dashboard/products";
 import Users from "views/dashboard/users";
 import Blogs from "views/dashboard/blogs";
 
-// Auth Imports
-import SignIn from "views/auth/SignIn";
-
 // Icon Imports
 import {
   MdHome,
@@ -18,7 +15,6 @@ import {
   MdInsertPhoto,
   MdNewspaper,
   MdPerson,
-  MdLock,
   MdHandshake,
 } from "react-icons/md";
 
@@ -65,13 +61,6 @@ const dashboardRoutes = [
     path: "blog",
     icon: <MdNewspaper className="h-6 w-6" />,
     component: <Blogs />,
-  },
-  {
-    name: "Sign In",
-    layout: "/auth",
-    path: "sign-in",
-    icon: <MdLock className="h-6 w-6" />,
-    component: <SignIn />,
   },
 ];
 export default dashboardRoutes;

@@ -22,7 +22,7 @@ const Sidebar = ({ open, onClose, routes = [] }) => {
           TERRA KOTA
         </div>
       </div>
-      <div class="daark:bg-white/30 mb-7 mt-[58px] h-px bg-gray-300" />
+      <div className="daark:bg-white/30 mb-7 mt-[58px] h-px bg-gray-300" />
       {/* Nav item */}
 
       <ul className="mb-auto pt-1">
