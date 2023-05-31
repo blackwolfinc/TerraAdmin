@@ -1,39 +1,89 @@
+import { useReducer, useContext } from "react";
 import InputField from "components/fields/InputField";
-import { FcGoogle } from "react-icons/fc";
 import Checkbox from "components/checkbox";
+import { useNavigate } from "react-router-dom";
+import { CookieStorage } from "utils/cookies";
+import { CookieKeys } from "utils/cookies";
+import { usePostLoginMutation } from "services/auth/post-login";
+import { Spinner } from "@chakra-ui/react";
+import { toast } from "react-toastify";
+import jwtDecode from "jwt-decode";
+import { UserContext } from "context/UserContext";
 
 export default function SignIn() {
+  const navigate = useNavigate();
+  const { setUser } = useContext(UserContext);
+  const { mutate: loginMutate, isLoading: loginLoading } =
+    usePostLoginMutation();
+  const [loginForm, setLoginForm] = useReducer(
+    (prev, next) => {
+      return { ...prev, ...next };
+    },
+    {
+      email: "",
+      password: "",
+    }
+  );
+
+  const submitLogin = (e) => {
+    e.preventDefault();
+
+    loginMutate(loginForm, {
+      onSuccess: (res) => {
+        const token = res.data.data.token;
+        const decoded = jwtDecode(token);
+        const userData = {
+          id: decoded.id,
+          name: decoded.name,
+          email: decoded.email,
+          role: decoded.role,
+        };
+
+        CookieStorage.set(CookieKeys.AuthToken, token, {
+          expires: new Date(decoded.exp * 1000),
+        });
+
+        CookieStorage.set(CookieKeys.User, userData, {
+          expires: new Date(decoded.exp * 1000),
+        });
+
+        setUser(userData);
+
+        toast.success("Login success!");
+        navigate("/dashboard", { replace: true });
+      },
+      onError: (err) => {
+        if (err.response.status === 401 || err.response.status === 500) {
+          toast.error("Invalid email or password");
+        }
+      },
+      onSettled: () => {
+        setLoginForm({ password: "" });
+      },
+    });
+  };
+
   return (
-    <div className="mt-16 mb-16 flex h-full w-full items-center justify-center px-2 md:mx-0 md:px-0 lg:mb-10 lg:items-center lg:justify-start">
+    <div className="mb-16 mt-16 flex h-full w-full items-center justify-center px-2 md:mx-0 md:px-0 lg:mb-10 lg:items-center lg:justify-start">
       {/* Sign in section */}
-      <div className="mt-[10vh] w-full max-w-full flex-col items-center md:pl-4 lg:pl-0 xl:max-w-[420px]">
+      <form
+        className="mt-[10vh] w-full max-w-full flex-col items-center md:pl-4 lg:pl-0 xl:max-w-[420px]"
+        onSubmit={submitLogin}
+      >
         <h4 className="mb-2.5 text-4xl font-bold text-navy-700 dark:text-white">
-          Sign In
+          Login
         </h4>
-        <p className="mb-9 ml-1 text-base text-gray-600">
-          Enter your email and password to sign in!
-        </p>
-        <div className="mb-6 flex h-[50px] w-full items-center justify-center gap-2 rounded-xl bg-lightPrimary hover:cursor-pointer dark:bg-navy-800">
-          <div className="rounded-full text-xl">
-            <FcGoogle />
-          </div>
-          <h5 className="text-sm font-medium text-navy-700 dark:text-white">
-            Sign In with Google
-          </h5>
-        </div>
-        <div className="mb-6 flex items-center  gap-3">
-          <div className="h-px w-full bg-gray-200 dark:bg-navy-700" />
-          <p className="text-base text-gray-600 dark:text-white"> or </p>
-          <div className="h-px w-full bg-gray-200 dark:bg-navy-700" />
-        </div>
         {/* Email */}
         <InputField
           variant="auth"
           extra="mb-3"
           label="Email*"
-          placeholder="mail@simmmple.com"
+          placeholder="Email"
           id="email"
-          type="text"
+          type="email"
+          required
+          onChange={(e) => setLoginForm({ email: e.target.value })}
+          value={loginForm.email}
         />
 
         {/* Password */}
@@ -44,6 +94,10 @@ export default function SignIn() {
           placeholder="Min. 8 characters"
           id="password"
           type="password"
+          minLength={8}
+          required
+          onChange={(e) => setLoginForm({ password: e.target.value })}
+          value={loginForm.password}
         />
         {/* Checkbox */}
         <div className="mb-4 flex items-center justify-between px-2">
@@ -53,17 +107,21 @@ export default function SignIn() {
               Keep me logged In
             </p>
           </div>
-          <a
+          {/* <a
             className="text-sm font-medium text-brand-500 hover:text-brand-600 dark:text-white"
             href=" "
           >
             Forgot Password?
-          </a>
+          </a> */}
         </div>
-        <button className="linear mt-2 w-full rounded-xl bg-brand-500 py-[12px] text-base font-medium text-white transition duration-200 hover:bg-brand-600 active:bg-brand-700 dark:bg-brand-400 dark:text-white dark:hover:bg-brand-300 dark:active:bg-brand-200">
-          Sign In
+        <button
+          type="submit"
+          className="linear mt-2 w-full rounded-xl bg-brand-500 py-[12px] text-base font-medium text-white transition duration-200 hover:bg-brand-600 active:bg-brand-700 dark:bg-brand-400 dark:text-white dark:hover:bg-brand-300 dark:active:bg-brand-200"
+        >
+          {loginLoading && <Spinner thickness="2px" speed="0.65s" size="xs" />}
+          {!loginLoading && <span>Login</span>}
         </button>
-        <div className="mt-4">
+        {/* <div className="mt-4">
           <span className=" text-sm font-medium text-navy-700 dark:text-gray-600">
             Not registered yet?
           </span>
@@ -73,8 +131,8 @@ export default function SignIn() {
           >
             Create an account
           </a>
-        </div>
-      </div>
+        </div> */}
+      </form>
     </div>
   );
 }

@@ -1,8 +1,9 @@
-import Footer from "components/footer/FooterAuthDefault";
-import authImg from "assets/img/auth/auth.png";
-import { Link, Routes, Route, Navigate } from "react-router-dom";
-import routes from "routers/routes.js";
-import FixedPlugin from "components/fixedPlugin/FixedPlugin";
+// import Footer from "components/footer/FooterAuthDefault";
+import authImg from "assets/img/auth/bg-auth.webp";
+import { Routes, Route, Navigate } from "react-router-dom";
+import authRoutes from "routers/authRoutes";
+// import FixedPlugin from "components/fixedPlugin/FixedPlugin";
+import { IsLoggedIn } from "utils/isAlreadyLoginChecker";
 
 export default function Auth() {
   const getRoutes = (routes) => {
@@ -16,16 +17,22 @@ export default function Auth() {
       }
     });
   };
+
+  if (IsLoggedIn()) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
   document.documentElement.dir = "ltr";
+
   return (
     <div>
       <div className="relative float-right h-full min-h-screen w-full !bg-white dark:!bg-navy-900">
-        <FixedPlugin />
+        {/* <FixedPlugin /> */}
         <main className={`mx-auto min-h-screen`}>
           <div className="relative flex">
             <div className="mx-auto flex min-h-full w-full flex-col justify-start pt-12 md:max-w-[75%] lg:h-screen lg:max-w-[1013px] lg:px-8 lg:pt-0 xl:h-[100vh] xl:max-w-[1383px] xl:px-0 xl:pl-[70px]">
               <div className="mb-auto flex flex-col pl-5 pr-5 md:pl-12 md:pr-0 lg:max-w-[48%] lg:pl-0 xl:max-w-full">
-                <Link to="/dashboard" className="mt-0 w-max lg:pt-10">
+                {/* <Link to="/dashboard" className="mt-0 w-max lg:pt-10">
                   <div className="mx-auto flex h-fit w-fit items-center hover:cursor-pointer">
                     <svg
                       width="8"
@@ -43,9 +50,9 @@ export default function Auth() {
                       Back to Dashboard
                     </p>
                   </div>
-                </Link>
+                </Link> */}
                 <Routes>
-                  {getRoutes(routes)}
+                  {getRoutes(authRoutes)}
                   <Route
                     path="/"
                     element={<Navigate to="/auth/sign-in" replace />}
@@ -58,7 +65,7 @@ export default function Auth() {
                   />
                 </div>
               </div>
-              <Footer />
+              {/* <Footer /> */}
             </div>
           </div>
         </main>
