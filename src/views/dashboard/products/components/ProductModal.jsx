@@ -199,7 +199,7 @@ const ProductModal = ({ isOpen, onClose, onSubmit, defaultValue }) => {
                 <input
                   id="multiple-upload"
                   type="file"
-                  accept=".png, .jpg .jpeg"
+                  accept="image/*"
                   onChange={(e) =>
                     setValue({
                       ...value,
@@ -273,7 +273,7 @@ const ProductModal = ({ isOpen, onClose, onSubmit, defaultValue }) => {
                   <input
                     id="single-upload"
                     type="file"
-                    accept=".png, .jpg .jpeg"
+                    accept="image/*"
                     onChange={(e) =>
                       setValue({ ...value, sketch: e.target.files[0] })
                     }
