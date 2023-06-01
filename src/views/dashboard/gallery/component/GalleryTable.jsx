@@ -64,7 +64,7 @@ const  PartnerTable = (props) => {
     };
 
     const handleDeleteGallery = (value) => {
-        if (!value) {
+        if (value) {
           if (typeof value === "object") {
               setDeleteGalleryData(value);
           } else {
