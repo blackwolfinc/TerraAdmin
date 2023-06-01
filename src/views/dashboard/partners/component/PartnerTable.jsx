@@ -10,7 +10,7 @@ import { Button, Image, useDisclosure } from "@chakra-ui/react";
 import { MdModeEditOutline } from "react-icons/md";
 import { HiTrash } from "react-icons/hi";
 import PartnerAddEdit from "./PartnerAddEdit";
-import UserDelete from "./PartnerDelete";
+import PartnerDelete from "./PartnerDelete";
 
 const  PartnerTable = (props) => {
     const { columnsData, tableData } = props;
@@ -204,7 +204,7 @@ const  PartnerTable = (props) => {
         onSubmit={handleSubmitPartner}
         defaultValue={editPartnerData ? editPartnerData : defaultValue}
       />
-      <UserDelete
+      <PartnerDelete
         data={deletePartnerData}
         onSubmit={handleDeletePartner}
       />

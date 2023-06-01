@@ -4,7 +4,7 @@ import partnerData from './partners.json'
 
 const Partners = () => {
 
-  const columnDataUser = [
+  const columnDataPartner = [
     {
       Header: "IMAGE",
       accessor: "image",
@@ -29,7 +29,7 @@ const Partners = () => {
 
   return (
     <div className="mt-8 bg-white rounded-full">
-      <Table columnsData={columnDataUser} tableData={partnerData} />
+      <Table columnsData={columnDataPartner} tableData={partnerData} />
     </div>
   );
 };
