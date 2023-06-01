@@ -163,7 +163,7 @@ const UserModal = (props) => {
             <Select
               placeholder="Select Role"
               name="role"
-              value={value.role || "ADMIN"}
+              value={value.role || setValue({ ...value, role: "ADMIN" })}
               onChange={handleChange}
             >
               <option value="SUPER ADMIN" disabled>
