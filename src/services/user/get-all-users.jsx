@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { API_ENDPOINT } from "utils/api-endpoint";
 import http from "utils/http";
 
-const fetchProductsData = async ({ queryKey }) => {
+const fetchUsersData = async ({ queryKey }) => {
   const [_key, _params] = queryKey;
   const { data } = await http.get(_key, { params: _params });
   return {
@@ -10,8 +10,8 @@ const fetchProductsData = async ({ queryKey }) => {
   };
 };
 
-const useProductsDataQuery = (options) => {
-  return useQuery([API_ENDPOINT.GET_ALL_PRODUCTS, options], fetchProductsData);
+const useUsersDataQuery = (options) => {
+  return useQuery([API_ENDPOINT.GET_ALL_USERS, options], fetchUsersData);
 };
 
-export { useProductsDataQuery, fetchProductsData };
+export { useUsersDataQuery, fetchUsersData };

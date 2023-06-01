@@ -24,7 +24,7 @@ const UserDelete = (props) => {
       <ModalContent>
         <ModalHeader className="text-center">Konfirmasi Hapus</ModalHeader>
         <ModalBody className="text-center">
-          Apakah Anda yakin ingin manghapus pengguna "{data?.username}"?
+          Apakah Anda yakin ingin manghapus pengguna "{data?.name}"?
         </ModalBody>
         <ModalFooter ml="auto" mr="auto">
           <Button colorScheme="red" mr={3} onClick={() => onSubmit(data.id)}>

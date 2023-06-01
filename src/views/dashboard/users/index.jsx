@@ -1,12 +1,18 @@
 import React from "react";
-import userData from "./userData.json";
 import UserTable from "./components/UserTable";
+import { UserContext } from "context/UserContext";
 
 const Users = () => {
+  const { user } = React.useContext(UserContext);
+
   const columnDataUser = [
     {
-      Header: "USERNAME",
-      accessor: "username",
+      Header: "FULLNAME",
+      accessor: "name",
+    },
+    {
+      Header: "EMAIL",
+      accessor: "email",
     },
     {
       Header: "ROLE",
@@ -24,7 +30,7 @@ const Users = () => {
 
   return (
     <div className="mt-3">
-      <UserTable columnsData={columnDataUser} tableData={userData} />
+      <UserTable columnsData={columnDataUser} />
     </div>
   );
 };

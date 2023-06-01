@@ -20,7 +20,7 @@ import { useUpdateProductMutation } from "services/product/put-product";
 import { toast } from "react-toastify";
 
 const ProductTable = ({ columnsData }) => {
-  const { data: showProducts, refetch: refetchShowProducts } =
+  const { data: fetchAllProducts, refetch: refetchAllProducts } =
     useProductsDataQuery();
   const { mutate: createProduct } = useCreateProductMutation();
   const { mutate: updateProduct } = useUpdateProductMutation();
@@ -30,8 +30,8 @@ const ProductTable = ({ columnsData }) => {
 
   const columns = React.useMemo(() => columnsData, [columnsData]);
   const data = React.useMemo(
-    () => showProducts?.data?.data?.datas || [],
-    [showProducts?.data?.data?.datas]
+    () => fetchAllProducts?.data?.data?.datas || [],
+    [fetchAllProducts?.data?.data?.datas]
   );
 
   const tableInstance = useTable(
@@ -120,10 +120,9 @@ const ProductTable = ({ columnsData }) => {
             Promise.all([uploadSketch(response), uploadImages(response)])
               .then(() => {
                 toast.success("Add product success!");
-                refetchShowProducts();
+                refetchAllProducts();
               })
               .catch((err) => {
-                // Error handling for uploadSketch or uploadImages
                 toast.error("Add product failed!");
               });
           },
@@ -148,20 +147,18 @@ const ProductTable = ({ columnsData }) => {
             const promises = [];
             if (value.sketch) promises.push(uploadSketch(response));
             if (value.images.length > 0) promises.push(uploadImages(response));
-
             if (promises.length > 0) {
               Promise.all(promises)
                 .then(() => {
                   toast.success("Update product success!");
-                  refetchShowProducts();
+                  refetchAllProducts();
                 })
                 .catch((err) => {
-                  // Error handling for uploadSketch or uploadImages
                   toast.error("Update product failed!");
                 });
             } else {
               toast.success("Update product success!");
-              refetchShowProducts();
+              refetchAllProducts();
             }
           },
           onError: (err) => {
@@ -171,86 +168,6 @@ const ProductTable = ({ columnsData }) => {
       );
     }
   };
-  //   const uploadImages = (response) => {
-  //     uploadImagesProduct(
-  //       {
-  //         id: response?.data?.data?.id,
-  //         image: value.images,
-  //       },
-  //       {
-  //         onSuccess: () => {
-  //           toast.success("Upload images product success!");
-  //         },
-  //         onError: (err) => {
-  //           toast.error("Upload images product failed!");
-  //         },
-  //       }
-  //     );
-  //   };
-
-  //   const uploadSketch = (response) => {
-  //     uploadSketchProduct(
-  //       {
-  //         id: response?.data?.data?.id,
-  //         image: value.sketch,
-  //       },
-  //       {
-  //         onSuccess: () => {
-  //           toast.success("Upload sketch product success!");
-  //         },
-  //         onError: (err) => {
-  //           toast.error("Upload sketch product failed!");
-  //         },
-  //       }
-  //     );
-  //   };
-
-  //   if (!value?.id) {
-  //     // For Submit Create Product
-  //     createProduct(
-  //       {
-  //         title: value.title,
-  //         description: value.description,
-  //         specification: value?.specification,
-  //       },
-  //       {
-  //         onSuccess: async (response) => {
-  //           // uploadSketch(response);
-  //           // uploadImages(response);
-  //           await Promise.all([uploadSketch(response), uploadImages(response)]);
-  //           toast.success("Add product success!");
-  //           refetchShowProducts();
-  //         },
-  //         onError: (err) => {
-  //           toast.error("Create product failed!");
-  //         },
-  //       }
-  //     );
-  //   } else {
-  //     // For Submit Update product
-  //     updateProduct(
-  //       {
-  //         id: value.id,
-  //         body: {
-  //           title: value.title,
-  //           description: value.description,
-  //           specification: value?.specification,
-  //         },
-  //       },
-  //       {
-  //         onSuccess: (response) => {
-  //           if (value.sketch) uploadSketch(response);
-  //           if (value.images.length > 0) uploadImages(response);
-  //           toast.success("Update product success!");
-  //           refetchShowProducts();
-  //         },
-  //         onError: (err) => {
-  //           toast.error("Update product failed!");
-  //         },
-  //       }
-  //     );
-  //   }
-  // };
 
   const handleEditProduct = (value) => {
     const newData = {
@@ -272,7 +189,7 @@ const ProductTable = ({ columnsData }) => {
       } else {
         deleteProduct(value, {
           onSuccess: () => {
-            refetchShowProducts();
+            refetchAllProducts();
             toast.success("Delete product success!");
           },
           onError: (err) => {
