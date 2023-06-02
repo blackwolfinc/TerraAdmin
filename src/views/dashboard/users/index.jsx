@@ -18,6 +18,9 @@ const Users = () => {
       Header: "ROLE",
       accessor: "role",
     },
+  ];
+
+  const columnAction = [
     {
       Header: "EDIT",
       accessor: "",
@@ -30,7 +33,14 @@ const Users = () => {
 
   return (
     <div className="mt-3">
-      <UserTable columnsData={columnDataUser} />
+      <UserTable
+        columnsData={
+          user.role === "SUPER ADMIN"
+            ? columnDataUser.concat(columnAction)
+            : columnDataUser
+        }
+        authUser={user}
+      />
     </div>
   );
 };

@@ -17,7 +17,7 @@ import { useUpdateUserMutation } from "services/user/put-user";
 import { toast } from "react-toastify";
 import { useDeleteUserMutation } from "services/user/delete-user";
 
-const UserTable = ({ columnsData }) => {
+const UserTable = ({ columnsData, authUser }) => {
   const { data: fetchAllUsers, refetch: refetchAllUsers } = useUsersDataQuery();
   const { mutate: createUser } = useCreateUserMutation();
   const { mutate: updateUser } = useUpdateUserMutation();
@@ -60,8 +60,6 @@ const UserTable = ({ columnsData }) => {
   }, [isOpen]);
 
   const handleSubmitUser = (value) => {
-    console.log("Submit User", value);
-
     if (!value?.id) {
       createUser(value, {
         onSuccess: () => {
@@ -125,12 +123,14 @@ const UserTable = ({ columnsData }) => {
         <div className="text-xl font-bold text-navy-700 dark:text-white">
           LIST USERS
         </div>
-        <button
-          onClick={onOpen}
-          className="linear rounded-xl bg-brand-500 px-8 py-2 text-center text-base font-medium text-white transition duration-200 hover:bg-brand-800 active:bg-brand-700"
-        >
-          ADD
-        </button>
+        {authUser.role === "SUPER ADMIN" && (
+          <button
+            onClick={onOpen}
+            className="linear rounded-xl bg-brand-500 px-8 py-2 text-center text-base font-medium text-white transition duration-200 hover:bg-brand-800 active:bg-brand-700"
+          >
+            ADD
+          </button>
+        )}
       </header>
 
       <div className="mt-8 overflow-x-scroll xl:overflow-x-hidden">
