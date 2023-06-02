@@ -182,7 +182,7 @@ const ProductModal = ({ isOpen, onClose, onSubmit, defaultValue }) => {
           <FormControl isRequired mt={4}>
             <FormLabel>Images</FormLabel>
             <Box
-              className="col-span-5 h-full w-full rounded-xl dark:!bg-navy-700 2xl:col-span-6"
+              className="col-span-5 h-full w-full rounded-xl bg-lightPrimary dark:!bg-navy-700 2xl:col-span-6"
               p={4}
             >
               <label
@@ -255,7 +255,7 @@ const ProductModal = ({ isOpen, onClose, onSubmit, defaultValue }) => {
           <FormControl isRequired mt={4}>
             <FormLabel>Sketch</FormLabel>
             <Box
-              className="col-span-5 h-full w-full rounded-xl dark:!bg-navy-700 2xl:col-span-6"
+              className="col-span-5 h-full w-full rounded-xl bg-lightPrimary dark:!bg-navy-700 2xl:col-span-6"
               p={4}
             >
               {!value.sketch ? (
