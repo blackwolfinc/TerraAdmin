@@ -7,7 +7,10 @@ import {
 } from "@chakra-ui/react";
 import { MdDelete, MdFileUpload } from "react-icons/md";
 
-const GalleryAddEdit = ({ isOpen, onClose, defaultValue }) => {
+const GalleryAddEdit = ({
+  isOpen, onClose, defaultValue,
+  addSubmit, editSubmit
+}) => {
   const [value, setValue] = useState({});
 
   const handleChange = (key, data) => {
@@ -16,18 +19,34 @@ const GalleryAddEdit = ({ isOpen, onClose, defaultValue }) => {
 
   const handleClose = () => {
     setValue({
-      link: '',
-      image:[]
+      title: '',
+      galleryImages:[]
     })
     onClose()
   }
   
   const handleSubmit = (val) => {
     val.preventDefault();
-    if (defaultValue.title) {
-      console.log('edit',value)
+    const isEdit = defaultValue.title;
+    
+    if (isEdit) {
+      const newImages = value.galleryImages.filter((item) =>
+        item instanceof File 
+      );
+      const formData = new FormData();
+      newImages.forEach((img) => { formData.append('image', img); });
+      editSubmit({
+        id: defaultValue.id,
+        title: value.title,
+        galleryImages:formData
+      })
     } else {
-      console.log('add', value)
+      const formData = new FormData();
+      value.galleryImages.forEach((img) => { formData.append('image', img); });
+      addSubmit({
+        title: value.title,
+        galleryImages:formData
+      })
     }
   }
 
@@ -36,7 +55,7 @@ const GalleryAddEdit = ({ isOpen, onClose, defaultValue }) => {
 
     setValue(defaultValue);
   }, [defaultValue]);
-console.log(value)
+
   return (
     <>
       <Modal closeOnOverlayClick={false} isOpen={isOpen} onClose={onClose}>
@@ -50,14 +69,14 @@ console.log(value)
             <ModalBody pb={8}>
               <div className="flex flex-col">
                 <FormControl isRequired mt={4}>
-                  <FormLabel>LINK</FormLabel>
+                  <FormLabel>Title</FormLabel>
                   <InputGroup>
                     <Input
                       type='text'
-                      placeholder="LINK"
-                      value={value.link || ""}
+                      placeholder="Title"
+                      value={value.title || ""}
                       onChange={(e) =>
-                        handleChange('link', e.target.value)
+                        handleChange('title', e.target.value)
                       }
                     />
                   </InputGroup>
@@ -84,10 +103,9 @@ console.log(value)
                           type="file"
                           accept=".png, .jpg"
                           onChange={(e) =>
-                            // handleChange('image',e.target.files)
                             setValue({
                               ...value,
-                              image: [...value.image, ...Array.from(e.target.files)]
+                              galleryImages: [...value.galleryImages, ...Array.from(e.target.files)]
                             })
                           }
                           multiple
@@ -95,9 +113,9 @@ console.log(value)
                         />
                       </label>
                       <Stack mt={4} spacing={2}>
-                        {value.image && value.image.map( (file, i) =>
+                        {value.galleryImages && value.galleryImages.map( (file, i) =>
                           <Box
-                            key={file.name}
+                            key={i}
                             borderWidth="2px"
                             borderRadius="xl"
                             p={2}
@@ -106,8 +124,8 @@ console.log(value)
                           >
                             <Image
                               src={
-                                typeof file === "string"
-                                  ? file
+                                typeof file.image_path === 'string'
+                                  ? `${process.env.REACT_APP_API_IMAGE}/${file.image_path}`
                                   : window.URL.createObjectURL(file)
                               }
                               alt="Preview"
@@ -115,14 +133,16 @@ console.log(value)
                               maxW="80px"
                               mr={2}
                             />
-                            <Text fontSize="sm">{file.name}</Text>
+                            <Text isTruncated fontSize="sm">
+                              {file.image_path ? file.image_path : file.name}
+                            </Text>
                             <Button
                               colorScheme="red"
                               size="sm"
                               onClick={() =>
                                 setValue({
                                  ...value,
-                                  image: value.image.filter(
+                                  galleryImages: value.galleryImages.filter(
                                     (selectedFile) => selectedFile !== file
                                   )
                                 })
