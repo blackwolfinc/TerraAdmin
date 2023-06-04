@@ -1,39 +1,26 @@
 import Cookies from "universal-cookie";
 
-const cookies = new Cookies();
-let serverCookies = undefined;
-
 export const CookieKeys = {
   AuthToken: "authToken",
-  Role: "role",
-  Username: "username",
+  User: "user",
   LimitError: 100,
 };
 
-const getCookieInstance = (ctx) => {
-  if (ctx?.req) {
-    serverCookies = serverCookies || new Cookies(ctx?.req?.headers?.cookie);
-    return serverCookies;
-  }
-
-  return cookies;
-};
+const cookies = new Cookies();
 
 const CookieOptions = {
   path: "/",
+  secure: true,
 };
 
 export const CookieStorage = {
-  set: (key, data, ctx) => {
-    const cookieInstances = getCookieInstance(ctx);
-    return cookieInstances.set(key, data, CookieOptions);
+  set: (key, data, options) => {
+    return cookies.set(key, data, { ...CookieOptions, ...options });
   },
-  get: (key, ctx) => {
-    const cookieInstances = getCookieInstance(ctx);
-    return cookieInstances.get(key);
+  get: (key, options) => {
+    return cookies.get(key, { ...CookieOptions, ...options });
   },
-  remove: (key, ctx) => {
-    const cookieInstances = getCookieInstance(ctx);
-    return cookieInstances.remove(key, CookieOptions);
+  remove: (key, options) => {
+    return cookies.remove(key, { ...CookieOptions, ...options });
   },
 };

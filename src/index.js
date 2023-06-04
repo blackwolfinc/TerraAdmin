@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { ChakraProvider } from "@chakra-ui/react";
 import { ToastContainer } from "react-toastify";
+import { UserProvider } from "context/UserContext";
 import "react-toastify/dist/ReactToastify.css";
 import "./index.css";
 
@@ -15,10 +16,12 @@ const queryClient = new QueryClient();
 root.render(
   <QueryClientProvider client={queryClient}>
     <ChakraProvider>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-      <ToastContainer position="bottom-right" />
+      <UserProvider>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+        <ToastContainer position="bottom-right" />
+      </UserProvider>
     </ChakraProvider>
     <ReactQueryDevtools initialIsOpen={false} />
   </QueryClientProvider>

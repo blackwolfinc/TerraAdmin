@@ -1,13 +1,13 @@
 import axios from "axios";
-import { CookieKeys } from "./constant";
-import { CookieStorage } from "./setup-cokkies";
+import { CookieStorage, CookieKeys } from "./cookies";
 
 const http = axios.create({
-  baseURL: process.env.REACT_APP_SERVER_URL,
+  baseURL: process.env.REACT_APP_API_URL,
   timeout: 30000,
   headers: {
     Accept: "application/json",
     "Content-Type": "application/json",
+    "x-api-key": "j9361zel0oh68u5etulvv38tcclolz",
   },
 });
 
@@ -24,6 +24,11 @@ http.interceptors.request.use(
     return config;
   },
   (error) => {
+    if (error.response.status === 401) {
+      CookieStorage.remove(CookieKeys.AuthToken);
+      window.location.href = "/auth/login";
+    }
+
     return Promise.reject(error);
   }
 );

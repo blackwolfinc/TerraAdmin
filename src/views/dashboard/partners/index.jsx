@@ -1,7 +1,37 @@
+import Table from './component/PartnerTable'
 import React from "react";
+import partnerData from './partners.json'
 
 const Partners = () => {
-  return <div className="mt-3">Partners</div>;
+
+  const columnDataPartner = [
+    {
+      Header: "IMAGE",
+      accessor: "image",
+    },
+    {
+      Header: "TITLE",
+      accessor: "title",
+    },
+    {
+      Header: "LINK",
+      accessor: "link",
+    },
+    {
+      Header: "EDIT",
+      accessor: "",
+    },
+    {
+      Header: "DELETE",
+      accessor: "",
+    },
+  ];
+
+  return (
+    <div className="mt-8 bg-white rounded-full">
+      <Table columnsData={columnDataPartner} tableData={partnerData} />
+    </div>
+  );
 };
 
 export default Partners;
