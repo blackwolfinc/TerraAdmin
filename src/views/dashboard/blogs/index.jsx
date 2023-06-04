@@ -1,6 +1,4 @@
 import React from "react";
-import { MdModeEditOutline, MdDelete, MdRemoveRedEye } from "react-icons/md";
-import { Table, Thead, Tbody, Tr, Th, Td } from "@chakra-ui/react";
 import Card from "components/card";
 import ModalInput from "./components/ModalInput";
 import ModalEdit from "./components/ModalEdit";
@@ -8,6 +6,7 @@ import ModalDelete from "./components/ModalDelete";
 
 // dummy data
 import { DummyBlog } from "./variables/dummyBlog";
+import BlogsTable from "./components/BlogsTable";
 
 const Blogs = () => {
   const [isModalCreateOpen, setIsModalCreateOpen] = React.useState(false);
@@ -62,55 +61,23 @@ const Blogs = () => {
       />
       {/* Main */}
       <Card extra={"mt-3 w-full sm:overflow-auto p-4"}>
-        <div className="mx-5 flex items-center justify-between pb-4">
-          {/* <div className="text-xl font-bold text-navy-700 dark:text-white">
-            Data Blogs
-          </div> */}
+        <div className="mb-4 flex items-center justify-between pb-4">
+          <div className="text-xl font-bold text-navy-700 dark:text-white">
+            LIST BLOGS
+          </div>
           <button
-            className="ml-auto rounded-xl bg-brand-500 px-5 py-3 text-sm font-medium text-white transition duration-200 hover:bg-brand-600 active:bg-brand-700 dark:bg-brand-400 dark:text-white dark:hover:bg-brand-300 dark:active:bg-brand-200"
+            className="linear rounded-xl bg-brand-500 px-8 py-2 text-center text-base font-medium text-white transition duration-200 hover:bg-brand-800 active:bg-brand-700"
             onClick={() => setIsModalCreateOpen(true)}
           >
             ADD
           </button>
         </div>
-        <Table variant="simple">
-          <Thead>
-            <Tr>
-              <Th className="w-full">Title</Th>
-              <Th>Lihat</Th>
-              <Th>Edit</Th>
-              <Th>Delete</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {DummyBlog.map((blog) => (
-              <Tr key={blog.id}>
-                <Td>{blog.title}</Td>
-                <Td>
-                  <div className="flex items-center justify-center">
-                    <button>
-                      <MdRemoveRedEye className="opacity-50 transition-all hover:opacity-100" />
-                    </button>
-                  </div>
-                </Td>
-                <Td>
-                  <div className="flex items-center justify-center">
-                    <button onClick={() => handleOpenEdit(blog.id)}>
-                      <MdModeEditOutline className="opacity-50 transition-all hover:opacity-100" />
-                    </button>
-                  </div>
-                </Td>
-                <Td>
-                  <div className="flex items-center justify-center">
-                    <button onClick={() => handleOpenDelete(blog.id)}>
-                      <MdDelete className="text-red-500 opacity-50 transition-all hover:opacity-100" />
-                    </button>
-                  </div>
-                </Td>
-              </Tr>
-            ))}
-          </Tbody>
-        </Table>
+        <BlogsTable
+          tableData={DummyBlog}
+          onDetail={(id) => console.log(`Lihat detail product ${id}`)}
+          onEdit={handleOpenEdit}
+          onDelete={handleOpenDelete}
+        />
       </Card>
     </>
   );
