@@ -19,10 +19,22 @@ import { useEditPartnerMutation } from "../../../../services/partner/patch-partn
 import { toast } from "react-toastify";
 
 const PartnerTable = (props) => {
-  const { columnsData, tableData } = props;
+  const { columnsData } = props;
+
+   const {
+    data: partnerData,
+    refetch: refetchShowPartner,
+  } = usePartnerDataQuery();
+
+  const { mutate: createTitle } = useCreatePartnerMutation();
+  const { mutate: uploadImage } = useCreatePartnerImageMutation();
+  const { mutate: updateTitle } = useEditPartnerMutation();
+  const { mutate: deletePartner } = useDeletePartnerMutation();
+
 
   const columns = useMemo(() => columnsData, [columnsData]);
-  const data = useMemo(() => tableData, [tableData]);
+  const data = useMemo(() => 
+     partnerData?.data?.data?.datas || [], [partnerData?.data?.data?.datas]);
 
   const defaultValue = {
     title: "",
@@ -55,33 +67,117 @@ const PartnerTable = (props) => {
   const [editPartnerData, setEditPartnerData] = useState(null);
   const [deletePartnerData, setDeletePartnerData] = useState(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (isOpen) return;
 
     setEditPartnerData(null);
   }, [isOpen]);
-
-  const handleSubmitPartner = (value) => {
-    console.log("Submit Partnrt", value);
-  };
 
   const handleEditPartner = (value) => {
     setEditPartnerData(value);
     onOpen();
   };
 
-  const handleDeletePartner = (value) => {
+ const handleDeletePartner = (value) => {
     if (value) {
       if (typeof value === "object") {
         setDeletePartnerData(value);
       } else {
-        console.log("Delete Partner", value);
+        deletePartner(value, {
+          onSuccess: () => {
+            refetchShowPartner();
+            toast.success("Delete Partner success!");
+          },
+          onError: (err) => {
+            toast.error("Delete Partner failed!");
+          },
+        });
         setDeletePartnerData(null);
       }
     } else {
       setDeletePartnerData(null);
     }
   };
+
+  const AddSubmit = ({ title, link, image }) => {
+    createTitle(
+      {
+        title: title,
+        link: link
+      },
+      {
+        onSuccess: (response) => {
+          uploadImage(
+            {
+              id: response.data.data.id,
+              image: image,
+            },
+            {
+              onSuccess: () => {
+                onClose()
+                refetchShowPartner()
+                toast.success("Edit partner success!");
+                // resolve();
+              },
+              onError: (err) => {
+                console.log(err)
+                toast.error("Upload Image partner failed!");
+                // reject(err);
+              },
+            }
+          );  
+        },
+        onError: (err) => {
+          toast.error("Create partner failed!");
+        },
+      }
+    );
+  }
+
+  const EditSubmit = ({ id, title, link, image }) => {
+    const isUploadImage = typeof image === 'string'
+    updateTitle(
+      {
+        id: id,
+        title: title,
+        link:link
+      },
+      {
+        onSuccess: () => {
+          if (!isUploadImage) {
+          const formData = new FormData();
+          formData.append('image', image[0])
+            uploadImage(
+              {
+                id: id,
+                image: formData,
+              },
+              {
+                onSuccess: () => {
+                  onClose()
+                  refetchShowPartner()
+                  toast.success("Create partner success!");
+                  // resolve();
+                },
+                onError: (err) => {
+                  console.log(err)
+                  toast.error("Create partner failed!");
+                  // reject(err);
+                },
+              }
+            );  
+          } else {
+            onClose()
+            refetchShowPartner()
+            toast.success("Create partner success!");
+          }
+        },
+        onError: (err) => {
+          toast.error("Create partner failed!");
+        },
+      }
+    );
+  }
 
   useEffect(() => {
     if (isOpen) return;
@@ -146,7 +242,7 @@ const PartnerTable = (props) => {
                           <Image
                             boxSize="4rem"
                             objectFit="cover"
-                            src={cell.value}
+                            src={`${process.env.REACT_APP_API_IMAGE}/${cell.value}`}
                             alt={`image-${index}`}
                           />
                         </p>
@@ -219,7 +315,6 @@ const PartnerTable = (props) => {
         data={deletePartnerData}
         onSubmit={handleDeletePartner}
       />
-      <PartnerDelete data={deletePartnerData} onSubmit={handleDeletePartner} />
     </Card>
   );
 };

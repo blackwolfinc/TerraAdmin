@@ -29,6 +29,7 @@ const PartnerAddEdit = ({
   const handleSubmit = (val) => {
     val.preventDefault();
     const isEdit = defaultValue.title;
+    console.log(value)
     
     if (isEdit) {
       editSubmit({
@@ -132,7 +133,7 @@ const PartnerAddEdit = ({
                           >
                             <Image
                               src={
-                                typeof value?.image[0] === "string"
+                                typeof value?.image === "string"
                                   ? `${process.env.REACT_APP_API_IMAGE}/${value?.image}`
                                   : URL.createObjectURL(value?.image[0])
                               }
