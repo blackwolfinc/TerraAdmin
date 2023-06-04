@@ -1,17 +1,26 @@
 import React from "react";
-import userData from "./userData.json";
 import UserTable from "./components/UserTable";
+import { UserContext } from "context/UserContext";
 
 const Users = () => {
+  const { user } = React.useContext(UserContext);
+
   const columnDataUser = [
     {
-      Header: "USERNAME",
-      accessor: "username",
+      Header: "FULLNAME",
+      accessor: "name",
+    },
+    {
+      Header: "EMAIL",
+      accessor: "email",
     },
     {
       Header: "ROLE",
       accessor: "role",
     },
+  ];
+
+  const columnAction = [
     {
       Header: "EDIT",
       accessor: "",
@@ -24,7 +33,14 @@ const Users = () => {
 
   return (
     <div className="mt-3">
-      <UserTable columnsData={columnDataUser} tableData={userData} />
+      <UserTable
+        columnsData={
+          user.role === "SUPER ADMIN"
+            ? columnDataUser.concat(columnAction)
+            : columnDataUser
+        }
+        authUser={user}
+      />
     </div>
   );
 };

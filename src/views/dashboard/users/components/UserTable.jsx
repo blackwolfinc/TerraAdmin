@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React from "react";
 import {
   useGlobalFilter,
   usePagination,
@@ -6,17 +6,28 @@ import {
   useTable,
 } from "react-table";
 import Card from "components/card";
-import { Button, useDisclosure } from "@chakra-ui/react";
+import { Button, Tag, TagLabel, useDisclosure } from "@chakra-ui/react";
 import { MdModeEditOutline } from "react-icons/md";
 import { HiTrash } from "react-icons/hi";
 import UserModal from "./UserModal";
 import UserDelete from "./UserDelete";
+import { useUsersDataQuery } from "services/user/get-all-users";
+import { useCreateUserMutation } from "services/user/post-user";
+import { useUpdateUserMutation } from "services/user/put-user";
+import { toast } from "react-toastify";
+import { useDeleteUserMutation } from "services/user/delete-user";
 
-const UserTable = (props) => {
-  const { columnsData, tableData } = props;
+const UserTable = ({ columnsData, authUser }) => {
+  const { data: fetchAllUsers, refetch: refetchAllUsers } = useUsersDataQuery();
+  const { mutate: createUser } = useCreateUserMutation();
+  const { mutate: updateUser } = useUpdateUserMutation();
+  const { mutate: deleteUser } = useDeleteUserMutation();
 
-  const columns = useMemo(() => columnsData, [columnsData]);
-  const data = useMemo(() => tableData, [tableData]);
+  const columns = React.useMemo(() => columnsData, [columnsData]);
+  const data = React.useMemo(
+    () => fetchAllUsers?.data?.data?.datas || [],
+    [fetchAllUsers?.data?.data?.datas]
+  );
 
   const tableInstance = useTable(
     {
@@ -49,7 +60,35 @@ const UserTable = (props) => {
   }, [isOpen]);
 
   const handleSubmitUser = (value) => {
-    console.log("Submit User", value);
+    if (!value?.id) {
+      createUser(value, {
+        onSuccess: () => {
+          refetchAllUsers();
+          toast.success("Create user success!");
+        },
+        onError: (err) => {
+          toast.error("Create user failed!");
+        },
+      });
+    } else {
+      const id = value.id;
+      delete value.id;
+      updateUser(
+        {
+          id: id,
+          body: value,
+        },
+        {
+          onSuccess: () => {
+            refetchAllUsers();
+            toast.success("Update user success!");
+          },
+          onError: (err) => {
+            toast.error("Update user failed!");
+          },
+        }
+      );
+    }
   };
 
   const handleEditUser = (value) => {
@@ -62,7 +101,15 @@ const UserTable = (props) => {
       if (typeof value === "object") {
         setDeleteUserData(value);
       } else {
-        console.log("Delete User", value);
+        deleteUser(value, {
+          onSuccess: () => {
+            refetchAllUsers();
+            toast.success("Delete product success!");
+          },
+          onError: (err) => {
+            toast.error("Delete product failed!");
+          },
+        });
         setDeleteUserData(null);
       }
     } else {
@@ -74,14 +121,16 @@ const UserTable = (props) => {
     <Card extra={"w-full pb-10 p-4 h-full"}>
       <header className="relative flex items-center justify-between">
         <div className="text-xl font-bold text-navy-700 dark:text-white">
-          LIST User
+          LIST USERS
         </div>
-        <button
-          onClick={onOpen}
-          className="linear rounded-xl bg-brand-500 px-8 py-2 text-center text-base font-medium text-white transition duration-200 hover:bg-brand-800 active:bg-brand-700"
-        >
-          ADD
-        </button>
+        {authUser.role === "SUPER ADMIN" && (
+          <button
+            onClick={onOpen}
+            className="linear rounded-xl bg-brand-500 px-8 py-2 text-center text-base font-medium text-white transition duration-200 hover:bg-brand-800 active:bg-brand-700"
+          >
+            ADD
+          </button>
+        )}
       </header>
 
       <div className="mt-8 overflow-x-scroll xl:overflow-x-hidden">
@@ -94,16 +143,17 @@ const UserTable = (props) => {
                     {...column.getHeaderProps(column.getSortByToggleProps())}
                     key={index}
                     className={`${
-                      column.Header === "EDIT" || column.Header === "DELETE"
-                        ? "w-[80px]"
-                        : "pr-14"
+                      (column.Header === "ROLE" && "w-[200px]") ||
+                      (column.Header === "EDIT" && "w-[80px]") ||
+                      (column.Header === "DELETE" && "w-[80px]") ||
+                      "pr-14"
                     } border-b border-gray-200 pb-[10px] text-start dark:!border-navy-700`}
                   >
                     <div
                       className={`${
-                        column.Header === "EDIT" || column.Header === "DELETE"
-                          ? "justify-center"
-                          : "justify-between"
+                        (column.Header === "EDIT" && "justify-center") ||
+                        (column.Header === "DELETE" && "justify-center") ||
+                        "justify-between"
                       } flex w-full text-xs tracking-wide text-gray-600`}
                     >
                       {column.render("Header")}
@@ -121,7 +171,13 @@ const UserTable = (props) => {
                 <tr {...row.getRowProps()} key={index}>
                   {row.cells.map((cell, index) => {
                     let data;
-                    if (cell.column.Header === "USERNAME") {
+                    if (cell.column.Header === "FULLNAME") {
+                      data = (
+                        <p className="pr-14 text-sm font-bold text-navy-700 dark:text-white">
+                          {cell.value}
+                        </p>
+                      );
+                    } else if (cell.column.Header === "EMAIL") {
                       data = (
                         <p className="pr-14 text-sm font-bold text-navy-700 dark:text-white">
                           {cell.value}
@@ -130,7 +186,17 @@ const UserTable = (props) => {
                     } else if (cell.column.Header === "ROLE") {
                       data = (
                         <p className="pr-14 text-sm font-semibold text-navy-700 dark:text-white">
-                          {cell.value}
+                          <Tag
+                            size="sm"
+                            borderRadius="full"
+                            variant="solid"
+                            colorScheme={
+                              (cell.value === "SUPER ADMIN" && "blue") ||
+                              (cell.value === "ADMIN" && "orange")
+                            }
+                          >
+                            <TagLabel>{cell.value}</TagLabel>
+                          </Tag>
                         </p>
                       );
                     } else if (cell.column.Header === "EDIT") {

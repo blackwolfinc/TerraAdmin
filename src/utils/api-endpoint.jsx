@@ -1,7 +1,10 @@
 export const API_ENDPOINT = {
   LOGIN: "/auth/login",
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 =======
+=======
+>>>>>>> 59fe75b90ada2b7caa43bde3795e07b260ab55e6
   GET_ALL_PRODUCTS: "/product/",
   CREATE_PRODUCT: "/product/",
   UPLOAD_SKETCH_PRODUCT: "/product/image/denah/upload/",
@@ -11,6 +14,7 @@ export const API_ENDPOINT = {
   CREATE_USER: "/user/",
   UPDATE_USER: "/user/",
   DELETE_USER: "/user/",
+<<<<<<< HEAD
   //GALLERY
   GET_ALL_GALLERY: "/gallery",
   POST_GALLERY_TITLE: "/gallery",
@@ -24,4 +28,6 @@ export const API_ENDPOINT = {
   PATCH_PARTNER: "/partner/",
   DELETE_PARTNER: "/partner/"
 >>>>>>> Stashed changes
+=======
+>>>>>>> 59fe75b90ada2b7caa43bde3795e07b260ab55e6
 };

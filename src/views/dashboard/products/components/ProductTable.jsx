@@ -11,10 +11,28 @@ import { MdModeEditOutline } from "react-icons/md";
 import { HiTrash, HiEye } from "react-icons/hi";
 import ProductModal from "./ProductModal";
 import ProductDelete from "./ProductDelete";
+import { useProductsDataQuery } from "services/product/get-all-products";
+import { useCreateProductMutation } from "services/product/post-product";
+import { useUploadSketchProductMutation } from "services/product/post-sketch-product";
+import { useUploadImagesProductMutation } from "services/product/post-images-product";
+import { useDeleteProductMutation } from "services/product/delete-product";
+import { useUpdateProductMutation } from "services/product/put-product";
+import { toast } from "react-toastify";
 
-const ProductTable = ({ columnsData, tableData }) => {
+const ProductTable = ({ columnsData }) => {
+  const { data: fetchAllProducts, refetch: refetchAllProducts } =
+    useProductsDataQuery();
+  const { mutate: createProduct } = useCreateProductMutation();
+  const { mutate: updateProduct } = useUpdateProductMutation();
+  const { mutate: uploadSketchProduct } = useUploadSketchProductMutation();
+  const { mutate: uploadImagesProduct } = useUploadImagesProductMutation();
+  const { mutate: deleteProduct } = useDeleteProductMutation();
+
   const columns = React.useMemo(() => columnsData, [columnsData]);
-  const data = React.useMemo(() => tableData, [tableData]);
+  const data = React.useMemo(
+    () => fetchAllProducts?.data?.data?.datas || [],
+    [fetchAllProducts?.data?.data?.datas]
+  );
 
   const tableInstance = useTable(
     {
@@ -47,11 +65,120 @@ const ProductTable = ({ columnsData, tableData }) => {
   }, [isOpen]);
 
   const handleSubmitProduct = (value) => {
-    console.log("Submit Product", value);
+    const uploadImages = (response) => {
+      return new Promise((resolve, reject) => {
+        uploadImagesProduct(
+          {
+            id: response?.data?.data?.id,
+            image: value.images,
+          },
+          {
+            onSuccess: () => {
+              toast.success("Upload images product success!");
+              resolve();
+            },
+            onError: (err) => {
+              toast.error("Upload images product failed!");
+              reject(err);
+            },
+          }
+        );
+      });
+    };
+
+    const uploadSketch = (response) => {
+      return new Promise((resolve, reject) => {
+        uploadSketchProduct(
+          {
+            id: response?.data?.data?.id,
+            image: value.sketch,
+          },
+          {
+            onSuccess: () => {
+              toast.success("Upload sketch product success!");
+              resolve();
+            },
+            onError: (err) => {
+              toast.error("Upload sketch product failed!");
+              reject(err);
+            },
+          }
+        );
+      });
+    };
+
+    if (!value?.id) {
+      // For Submit Create Product
+      createProduct(
+        {
+          title: value.title,
+          description: value.description,
+          specification: value?.specification,
+        },
+        {
+          onSuccess: (response) => {
+            Promise.all([uploadSketch(response), uploadImages(response)])
+              .then(() => {
+                toast.success("Add product success!");
+                refetchAllProducts();
+              })
+              .catch((err) => {
+                toast.error("Add product failed!");
+              });
+          },
+          onError: (err) => {
+            toast.error("Create product failed!");
+          },
+        }
+      );
+    } else {
+      // For Submit Update product
+      updateProduct(
+        {
+          id: value.id,
+          body: {
+            title: value.title,
+            description: value.description,
+            specification: value?.specification,
+          },
+        },
+        {
+          onSuccess: (response) => {
+            const promises = [];
+            if (value.sketch) promises.push(uploadSketch(response));
+            if (value.images.length > 0) promises.push(uploadImages(response));
+            if (promises.length > 0) {
+              Promise.all(promises)
+                .then(() => {
+                  toast.success("Update product success!");
+                  refetchAllProducts();
+                })
+                .catch((err) => {
+                  toast.error("Update product failed!");
+                });
+            } else {
+              toast.success("Update product success!");
+              refetchAllProducts();
+            }
+          },
+          onError: (err) => {
+            toast.error("Update product failed!");
+          },
+        }
+      );
+    }
   };
 
   const handleEditProduct = (value) => {
-    setEditProductData(value);
+    const newData = {
+      id: value.id,
+      title: value.title,
+      description: value.description,
+      specification: value.specification,
+      sketch: value.image_denah_path,
+      images: value.productImageSlides,
+    };
+    setEditProductData(newData);
     onOpen();
   };
 
@@ -60,7 +187,15 @@ const ProductTable = ({ columnsData, tableData }) => {
       if (typeof value === "object") {
         setDeleteProductData(value);
       } else {
-        console.log("Delete Product", value);
+        deleteProduct(value, {
+          onSuccess: () => {
+            refetchAllProducts();
+            toast.success("Delete product success!");
+          },
+          onError: (err) => {
+            toast.error("Delete product failed!");
+          },
+        });
         setDeleteProductData(null);
       }
     } else {
@@ -69,7 +204,7 @@ const ProductTable = ({ columnsData, tableData }) => {
   };
 
   return (
-    <Card extra={"w-full pb-10 p-4 h-full"}>
+    <Card extra="w-full pb-10 p-4 h-full">
       <header className="relative flex items-center justify-between">
         <div className="text-xl font-bold text-navy-700 dark:text-white">
           LIST PRODUCT
@@ -131,7 +266,11 @@ const ProductTable = ({ columnsData, tableData }) => {
                           <Image
                             boxSize="4rem"
                             objectFit="cover"
-                            src={cell.value[0]}
+                            src={
+                              cell?.value[0]
+                                ? `${process.env.REACT_APP_API_IMAGE}/${cell?.value[0]?.image_path}`
+                                : ""
+                            }
                             alt={`image-${index}`}
                           />
                         </p>

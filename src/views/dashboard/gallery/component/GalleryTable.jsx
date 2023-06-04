@@ -9,91 +9,84 @@ import Card from "components/card";
 import { Button, Image, useDisclosure } from "@chakra-ui/react";
 import { MdModeEditOutline } from "react-icons/md";
 import { HiTrash } from "react-icons/hi";
-import PartnerAddEdit from "./PartnerAddEdit";
-import PartnerDelete from "./PartnerDelete";
-import { usePartnerDataQuery } from '../../../../services/partner/get-all-partner'
-import { useCreatePartnerMutation } from "../../../../services/partner/post-partner";
-import { useCreatePartnerImageMutation } from "../../../../services/partner/post-partner-image";
-import { useDeletePartnerMutation } from "../../../../services/partner/delete-partner";
-import { useEditPartnerMutation } from "../../../../services/partner/patch-partner";
-import { toast } from "react-toastify";
+import GalleryAddEdit from "./GalleryAddEdit";
+import GalleryDelete from "./GalleryDelete";
 
-const PartnerTable = (props) => {
-  const { columnsData, tableData } = props;
+const  PartnerTable = (props) => {
+    const { columnsData, tableData } = props;
 
-  const columns = useMemo(() => columnsData, [columnsData]);
-  const data = useMemo(() => tableData, [tableData]);
+    const columns = useMemo(() => columnsData, [columnsData]);
+    const data = useMemo(() => tableData, [tableData]);
 
-  const defaultValue = {
-    title: "",
-    link: "",
-    image: [],
-  };
-
-  const tableInstance = useTable(
-    {
-      columns,
-      data,
-    },
-    useGlobalFilter,
-    useSortBy,
-    usePagination
-  );
-
-  const {
-    getTableProps,
-    getTableBodyProps,
-    headerGroups,
-    page,
-    prepareRow,
-    initialState,
-  } = tableInstance;
-
-  initialState.pageSize = 5;
-
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const [editPartnerData, setEditPartnerData] = useState(null);
-  const [deletePartnerData, setDeletePartnerData] = useState(null);
-
-  React.useEffect(() => {
-    if (isOpen) return;
-
-    setEditPartnerData(null);
-  }, [isOpen]);
-
-  const handleSubmitPartner = (value) => {
-    console.log("Submit Partnrt", value);
-  };
-
-  const handleEditPartner = (value) => {
-    setEditPartnerData(value);
-    onOpen();
-  };
-
-  const handleDeletePartner = (value) => {
-    if (value) {
-      if (typeof value === "object") {
-        setDeletePartnerData(value);
-      } else {
-        console.log("Delete Partner", value);
-        setDeletePartnerData(null);
-      }
-    } else {
-      setDeletePartnerData(null);
+    const defaultValue = {
+        title: '',
+        image:[]
     }
-  };
 
-  useEffect(() => {
-    if (isOpen) return;
+    const tableInstance = useTable(
+        {
+        columns,
+        data,
+        },
+        useGlobalFilter,
+        useSortBy,
+        usePagination
+    );
 
-    setEditPartnerData(null);
-  }, [isOpen]);
+    const {
+        getTableProps,
+        getTableBodyProps,
+        headerGroups,
+        page,
+        prepareRow,
+        initialState,
+        } = tableInstance;
+        
+    initialState.pageSize = 5;
+
+    const { isOpen, onOpen, onClose } = useDisclosure();
+    const [editGalleryData, setEditGalleryData] = useState(null);
+    const [deleteGalleryData, setDeleteGalleryData] = useState(null);
+
+    React.useEffect(() => {
+        if (isOpen) return;
+
+        setEditGalleryData(null);
+    }, [isOpen]);
+
+    const handleSubmitGallery = (value) => {
+        console.log("Submit Gallery", value);
+    };
+
+    const handleEditGallery = (value) => {
+        setEditGalleryData(value);
+        onOpen();
+    };
+
+    const handleDeleteGallery = (value) => {
+        if (value) {
+          if (typeof value === "object") {
+              setDeleteGalleryData(value);
+          } else {
+              console.log("Delete Gallery", value);
+              setDeleteGalleryData(null);
+          }
+        } else {
+          setDeleteGalleryData(null);
+        }
+    };
+
+    useEffect(() => {
+        if (isOpen) return;
+
+        setEditGalleryData(null);
+    }, [isOpen]);
 
   return (
     <Card extra={"w-full pb-10 p-4 h-full"}>
       <header className="relative flex items-center justify-between">
-        <div className="text-xl font-bold uppercase text-navy-700 dark:text-white">
-          partner list
+        <div className="text-xl font-bold text-navy-700 dark:text-white uppercase">
+          gallery list
         </div>
         <button
           onClick={onOpen}
@@ -142,13 +135,17 @@ const PartnerTable = (props) => {
                     let data;
                     if (cell.column.Header.toUpperCase() === "IMAGE") {
                       data = (
-                        <p className="pr-14 text-sm font-bold text-navy-700 dark:text-white">
-                          <Image
-                            boxSize="4rem"
-                            objectFit="cover"
-                            src={cell.value}
-                            alt={`image-${index}`}
-                          />
+                        <p className="pr-14 text-sm font-bold text-navy-700 dark:text-white flex flex-row gap-5">
+                          {cell.value.slice(0,5).map((value) => {
+                            return (
+                              <Image
+                                boxSize="4rem"
+                                objectFit="cover"
+                                src={cell.value[0]}
+                                alt={`image-${index}`}
+                              />
+                            )
+                          })}
                         </p>
                       );
                     } else if (cell.column.Header.toUpperCase() === "TITLE") {
@@ -157,21 +154,13 @@ const PartnerTable = (props) => {
                           {cell.value}
                         </p>
                       );
-                    } else if (cell.column.Header.toUpperCase() === "LINK") {
-                      data = (
-                        <p className="pr-14 text-sm font-semibold text-blue-700 hover:underline dark:text-white">
-                          <a href={cell.value} target="_blank" rel="noreferrer">
-                            Link to {cell.row.cells[1].value}
-                          </a>
-                        </p>
-                      );
-                    } else if (cell.column.Header.toUpperCase() === "EDIT") {
+                    }else if (cell.column.Header.toUpperCase() === "EDIT") {
                       data = (
                         <div className="flex justify-center text-gray-900 dark:text-white">
                           <Button
                             colorScheme="purple"
                             size="sm"
-                            onClick={() => handleEditPartner(cell.row.original)}
+                            onClick={() => handleEditGallery(cell.row.original)}
                           >
                             <MdModeEditOutline />
                           </Button>
@@ -183,9 +172,7 @@ const PartnerTable = (props) => {
                           <Button
                             colorScheme="red"
                             size="sm"
-                            onClick={() =>
-                              handleDeletePartner(cell.row.original)
-                            }
+                            onClick={() => handleDeleteGallery(cell.row.original)}
                           >
                             <HiTrash />
                           </Button>
@@ -208,18 +195,16 @@ const PartnerTable = (props) => {
           </tbody>
         </table>
       </div>
-      <PartnerAddEdit
+      <GalleryAddEdit
         isOpen={isOpen}
         onClose={onClose}
-        defaultValue={editPartnerData ? editPartnerData : defaultValue}
-        addSubmit={AddSubmit}
-        editSubmit={EditSubmit}
+        onSubmit={handleSubmitGallery}
+        defaultValue={editGalleryData ? editGalleryData : defaultValue}
       />
-      <PartnerDelete
-        data={deletePartnerData}
-        onSubmit={handleDeletePartner}
+      <GalleryDelete
+        data={deleteGalleryData}
+        onSubmit={handleDeleteGallery}
       />
-      <PartnerDelete data={deletePartnerData} onSubmit={handleDeletePartner} />
     </Card>
   );
 };

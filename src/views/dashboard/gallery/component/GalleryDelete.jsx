@@ -9,7 +9,7 @@ import {
   Button,
 } from "@chakra-ui/react";
 
-const UserDelete = (props) => {
+const GalleryDelete = (props) => {
   const { data, onSubmit } = props;
 
   return (
@@ -24,7 +24,7 @@ const UserDelete = (props) => {
       <ModalContent>
         <ModalHeader className="text-center">Konfirmasi Hapus</ModalHeader>
         <ModalBody className="text-center">
-          Apakah Anda yakin ingin manghapus pengguna "{data?.name}"?
+          Apakah Anda yakin ingin manghapus Gallery "{data?.title}"?
         </ModalBody>
         <ModalFooter ml="auto" mr="auto">
           <Button colorScheme="red" mr={3} onClick={() => onSubmit(data.id)}>
@@ -39,4 +39,4 @@ const UserDelete = (props) => {
   );
 };
 
-export default UserDelete;
+export default GalleryDelete;

@@ -1,12 +1,11 @@
 import React from "react";
 import ProductTable from "./components/ProductTable";
-import productData from "./productData.json";
 
 const Products = () => {
   const columnDataProduct = [
     {
       Header: "IMAGES",
-      accessor: "images",
+      accessor: "productImageSlides",
     },
     {
       Header: "TITLE",
@@ -28,7 +27,7 @@ const Products = () => {
 
   return (
     <div className="mt-3">
-      <ProductTable columnsData={columnDataProduct} tableData={productData} />
+      <ProductTable columnsData={columnDataProduct} />
     </div>
   );
 };
