@@ -11,76 +11,157 @@ import { MdModeEditOutline } from "react-icons/md";
 import { HiTrash } from "react-icons/hi";
 import GalleryAddEdit from "./GalleryAddEdit";
 import GalleryDelete from "./GalleryDelete";
+import { useGalleryDataQuery } from "services/gallery/get-all-gallery";
+import { useCreateGalleryTitleMutation } from "services/gallery/post-gallery-title";
+import { useCreateGalleryImageMutation } from "services/gallery/post-gallery-image";
+import { useEditGalleryTitleMutation } from "services/gallery/patch-gallery-title";
+import { useDeleteGalleryMutation } from "services/gallery/delete-product";
+import { toast } from "react-toastify";
 
-const  PartnerTable = (props) => {
-    const { columnsData, tableData } = props;
+const GalleryTable = ({ columnsData }) => {
+  const {
+    data: galleryData,
+    refetch: refetchShowGallery,
+  } = useGalleryDataQuery();
+  const { mutate: createTitle } = useCreateGalleryTitleMutation();
+  const { mutate: uploadImage } = useCreateGalleryImageMutation();
+  const { mutate: updateTitle } = useEditGalleryTitleMutation();
+  const { mutate: deleteGallery } = useDeleteGalleryMutation();
 
-    const columns = useMemo(() => columnsData, [columnsData]);
-    const data = useMemo(() => tableData, [tableData]);
+  const columns = useMemo(() => columnsData, [columnsData]);
+  const data = useMemo(() =>
+    galleryData?.data?.data?.datas || [], [galleryData?.data?.data?.datas]);
 
-    const defaultValue = {
-        title: '',
-        image:[]
+  const defaultValue = {
+    title: '',
+    galleryImages: []
+  }
+
+  const tableInstance = useTable(
+    {
+      columns,
+      data,
+    },
+    useGlobalFilter,
+    useSortBy,
+    usePagination
+  );
+
+  const {
+    getTableProps,
+    getTableBodyProps,
+    headerGroups,
+    page,
+    prepareRow,
+    initialState,
+  } = tableInstance;
+
+  initialState.pageSize = 5;
+
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [editGalleryData, setEditGalleryData] = useState(null);
+  const [deleteGalleryData, setDeleteGalleryData] = useState(null);
+
+  useEffect(() => {
+    if (isOpen) return;
+
+    setEditGalleryData(null);
+  }, [isOpen]);
+
+  const handleEditGallery = (value) => {
+    setEditGalleryData(value);
+    onOpen();
+  };
+
+  const handleDeleteGallery = (value) => {
+    if (value) {
+      if (typeof value === "object") {
+        setDeleteGalleryData(value);
+      } else {
+        deleteGallery(value, {
+          onSuccess: () => {
+            refetchShowGallery();
+            toast.success("Delete Gallery success!");
+          },
+          onError: (err) => {
+            toast.error("Delete Gallery failed!");
+          },
+        });
+        setDeleteGalleryData(null);
+      }
+    } else {
+      setDeleteGalleryData(null);
     }
+  };
 
-    const tableInstance = useTable(
-        {
-        columns,
-        data,
+  const AddSubmit = ({ title, galleryImages }) => {
+    createTitle(
+      {
+        title: title
+      },
+      {
+        onSuccess: (response) => {
+          uploadImage(
+            {
+              id: response.data.data.id,
+              image: galleryImages,
+            },
+            {
+              onSuccess: () => {
+                onClose()
+                refetchShowGallery()
+                toast.success("Edit product success!");
+                // resolve();
+              },
+              onError: (err) => {
+                console.log(err)
+                toast.error("Upload Image product failed!");
+                // reject(err);
+              },
+            }
+          );  
         },
-        useGlobalFilter,
-        useSortBy,
-        usePagination
+        onError: (err) => {
+          toast.error("Create Title product failed!");
+        },
+      }
     );
+  }
 
-    const {
-        getTableProps,
-        getTableBodyProps,
-        headerGroups,
-        page,
-        prepareRow,
-        initialState,
-        } = tableInstance;
-        
-    initialState.pageSize = 5;
-
-    const { isOpen, onOpen, onClose } = useDisclosure();
-    const [editGalleryData, setEditGalleryData] = useState(null);
-    const [deleteGalleryData, setDeleteGalleryData] = useState(null);
-
-    React.useEffect(() => {
-        if (isOpen) return;
-
-        setEditGalleryData(null);
-    }, [isOpen]);
-
-    const handleSubmitGallery = (value) => {
-        console.log("Submit Gallery", value);
-    };
-
-    const handleEditGallery = (value) => {
-        setEditGalleryData(value);
-        onOpen();
-    };
-
-    const handleDeleteGallery = (value) => {
-        if (value) {
-          if (typeof value === "object") {
-              setDeleteGalleryData(value);
-          } else {
-              console.log("Delete Gallery", value);
-              setDeleteGalleryData(null);
-          }
-        } else {
-          setDeleteGalleryData(null);
-        }
-    };
-
-    useEffect(() => {
-        if (isOpen) return;
-
-        setEditGalleryData(null);
-    }, [isOpen]);
+  const EditSubmit = ({ id, title, galleryImages }) => {
+    updateTitle(
+      {
+        id: id,
+        title: title
+      },
+      {
+        onSuccess: (response) => {
+          uploadImage(
+            {
+              id: id,
+              image: galleryImages,
+            },
+            {
+              onSuccess: () => {
+                onClose()
+                refetchShowGallery()
+                toast.success("Create product success!");
+                // resolve();
+              },
+              onError: (err) => {
+                console.log(err)
+                toast.error("Create product failed!");
+                // reject(err);
+              },
+            }
+          );  
+        },
+        onError: (err) => {
+          toast.error("Create Title product failed!");
+        },
+      }
+    );
+  }
 
   return (
     <Card extra={"w-full pb-10 p-4 h-full"}>
@@ -105,18 +186,16 @@ const  PartnerTable = (props) => {
                   <th
                     {...column.getHeaderProps(column.getSortByToggleProps())}
                     key={index}
-                    className={`${
-                      column.Header === "EDIT" || column.Header === "DELETE"
-                        ? "w-[80px]"
-                        : "pr-14"
-                    } border-b border-gray-200 pb-[10px] text-start dark:!border-navy-700`}
+                    className={`${column.Header === "EDIT" || column.Header === "DELETE"
+                      ? "w-[80px]"
+                      : "pr-14"
+                      } border-b border-gray-200 pb-[10px] text-start dark:!border-navy-700`}
                   >
                     <div
-                      className={`${
-                        column.Header === "EDIT" || column.Header === "DELETE"
-                          ? "justify-center"
-                          : "justify-between"
-                      } flex w-full text-xs tracking-wide text-gray-600`}
+                      className={`${column.Header === "EDIT" || column.Header === "DELETE"
+                        ? "justify-center"
+                        : "justify-between"
+                        } flex w-full text-xs tracking-wide text-gray-600`}
                     >
                       {column.render("Header")}
                     </div>
@@ -136,13 +215,14 @@ const  PartnerTable = (props) => {
                     if (cell.column.Header.toUpperCase() === "IMAGE") {
                       data = (
                         <p className="pr-14 text-sm font-bold text-navy-700 dark:text-white flex flex-row gap-5">
-                          {cell.value.slice(0,5).map((value) => {
+                          {cell.value?.slice(0, 5).map((value, i) => {
                             return (
                               <Image
+                                key={i}
                                 boxSize="4rem"
                                 objectFit="cover"
-                                src={cell.value[0]}
-                                alt={`image-${index}`}
+                                src={`${process.env.REACT_APP_API_IMAGE}/${value.image_path}`}
+                                alt={`image-${index}-${i}`}
                               />
                             )
                           })}
@@ -154,7 +234,7 @@ const  PartnerTable = (props) => {
                           {cell.value}
                         </p>
                       );
-                    }else if (cell.column.Header.toUpperCase() === "EDIT") {
+                    } else if (cell.column.Header.toUpperCase() === "EDIT") {
                       data = (
                         <div className="flex justify-center text-gray-900 dark:text-white">
                           <Button
@@ -198,8 +278,9 @@ const  PartnerTable = (props) => {
       <GalleryAddEdit
         isOpen={isOpen}
         onClose={onClose}
-        onSubmit={handleSubmitGallery}
         defaultValue={editGalleryData ? editGalleryData : defaultValue}
+        addSubmit={AddSubmit}
+        editSubmit={EditSubmit}
       />
       <GalleryDelete
         data={deleteGalleryData}
@@ -209,4 +290,4 @@ const  PartnerTable = (props) => {
   );
 };
 
-export default PartnerTable;
+export default GalleryTable;

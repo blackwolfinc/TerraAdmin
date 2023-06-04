@@ -1,9 +1,8 @@
 import React from "react";
 import Table from './component/GalleryTable'
-import galleryData from './gallery.json'
 
 const Gallery = () => {
-
+  
    const columnDataGallery = [
     {
       Header: "TITLE",
@@ -11,7 +10,7 @@ const Gallery = () => {
     },
     {
       Header: "IMAGE",
-      accessor: "image",
+      accessor: "galleryImages",
     },
     {
       Header: "EDIT",
@@ -27,7 +26,6 @@ const Gallery = () => {
     <div className="mt-8 bg-white rounded-full">
       <Table
         columnsData={columnDataGallery}
-        tableData={galleryData}   
       />
     </div>
   )
