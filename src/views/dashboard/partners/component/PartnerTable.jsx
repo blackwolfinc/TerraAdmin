@@ -11,6 +11,12 @@ import { MdModeEditOutline } from "react-icons/md";
 import { HiTrash } from "react-icons/hi";
 import PartnerAddEdit from "./PartnerAddEdit";
 import PartnerDelete from "./PartnerDelete";
+import { usePartnerDataQuery } from '../../../../services/partner/get-all-partner'
+import { useCreatePartnerMutation } from "../../../../services/partner/post-partner";
+import { useCreatePartnerImageMutation } from "../../../../services/partner/post-partner-image";
+import { useDeletePartnerMutation } from "../../../../services/partner/delete-partner";
+import { useEditPartnerMutation } from "../../../../services/partner/patch-partner";
+import { toast } from "react-toastify";
 
 const  PartnerTable = (props) => {
     const { columnsData, tableData } = props;
@@ -201,8 +207,13 @@ const  PartnerTable = (props) => {
       <PartnerAddEdit
         isOpen={isOpen}
         onClose={onClose}
-        onSubmit={handleSubmitPartner}
         defaultValue={editPartnerData ? editPartnerData : defaultValue}
+        addSubmit={AddSubmit}
+        editSubmit={EditSubmit}
+      />
+      <PartnerDelete
+        data={deletePartnerData}
+        onSubmit={handleDeletePartner}
       />
       <PartnerDelete
         data={deletePartnerData}

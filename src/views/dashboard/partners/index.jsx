@@ -1,6 +1,5 @@
 import Table from './component/PartnerTable'
 import React from "react";
-import partnerData from './partners.json'
 
 const Partners = () => {
 
@@ -29,7 +28,7 @@ const Partners = () => {
 
   return (
     <div className="mt-8 bg-white rounded-full">
-      <Table columnsData={columnDataPartner} tableData={partnerData} />
+      <Table columnsData={columnDataPartner} />
     </div>
   );
 };

@@ -7,9 +7,11 @@ import {
 } from "@chakra-ui/react";
 import { MdDelete, MdFileUpload } from "react-icons/md";
 
-const PartnerAddEdit = ({ isOpen, onClose, defaultValue }) => {
+const PartnerAddEdit = ({ 
+  isOpen, onClose, defaultValue,
+  addSubmit, editSubmit
+}) => {
   const [value, setValue] = useState({});
-  console.log(defaultValue )
 
   const handleChange = (key, data) => {
     setValue({ ...value, [key]: data });
@@ -26,10 +28,23 @@ const PartnerAddEdit = ({ isOpen, onClose, defaultValue }) => {
   
   const handleSubmit = (val) => {
     val.preventDefault();
-    if (defaultValue.title) {
-      console.log('edit',value)
+    const isEdit = defaultValue.title;
+    
+    if (isEdit) {
+      editSubmit({
+        id: defaultValue.id,
+        title: value.title,
+        link: value.link,
+        image: value.image
+      })
     } else {
-      console.log('add', value)
+      const formData = new FormData();
+      formData.append('image', value.image[0])
+      addSubmit({
+        title: value.title,
+        link: value.link,
+        image:formData
+      })
     }
   }
 
@@ -118,7 +133,7 @@ const PartnerAddEdit = ({ isOpen, onClose, defaultValue }) => {
                             <Image
                               src={
                                 typeof value?.image[0] === "string"
-                                  ? value?.image
+                                  ? `${process.env.REACT_APP_API_IMAGE}/${value?.image}`
                                   : URL.createObjectURL(value?.image[0])
                               }
                               alt="Preview"
@@ -126,12 +141,12 @@ const PartnerAddEdit = ({ isOpen, onClose, defaultValue }) => {
                               maxW="80px"
                               mr={2}
                             />
-                            <Text fontSize="sm">{value?.image[0]?.name}</Text>
+                            <Text fontSize="sm">{value.image[0].name ?? value.image}</Text>
                             <Button
-                              colorScheme="red"
+                              colorScheme="red" 
                               size="sm"
-                              onClick={() =>
-                                handleChange('image', [])
+                              onClick={(e) =>
+                                handleChange('image', e.target.files)
                               }
                               ml="auto"
                             >
