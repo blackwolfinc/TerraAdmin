@@ -110,19 +110,19 @@ const GalleryTable = ({ columnsData }) => {
               onSuccess: () => {
                 onClose()
                 refetchShowGallery()
-                toast.success("Edit product success!");
+                toast.success("Create gallery success!");
                 // resolve();
               },
               onError: (err) => {
                 console.log(err)
-                toast.error("Upload Image product failed!");
+                toast.error("Upload Image gallery failed!");
                 // reject(err);
               },
             }
           );  
         },
         onError: (err) => {
-          toast.error("Create Title product failed!");
+          toast.error("Create Title gallery failed!");
         },
       }
     );
@@ -135,7 +135,7 @@ const GalleryTable = ({ columnsData }) => {
         title: title
       },
       {
-        onSuccess: (response) => {
+        onSuccess: () => {
           uploadImage(
             {
               id: id,
@@ -145,19 +145,19 @@ const GalleryTable = ({ columnsData }) => {
               onSuccess: () => {
                 onClose()
                 refetchShowGallery()
-                toast.success("Create product success!");
+                toast.success("Edit gallery success!");
                 // resolve();
               },
               onError: (err) => {
                 console.log(err)
-                toast.error("Create product failed!");
+                toast.error("Upload gallery failed!");
                 // reject(err);
               },
             }
           );  
         },
         onError: (err) => {
-          toast.error("Create Title product failed!");
+          toast.error("Edit Title gallery failed!");
         },
       }
     );
