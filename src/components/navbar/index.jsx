@@ -6,12 +6,14 @@ import { BsArrowBarUp } from "react-icons/bs";
 import { FiSearch } from "react-icons/fi";
 // import { RiMoonFill, RiSunFill } from "react-icons/ri";
 import { IoMdNotificationsOutline } from "react-icons/io";
-import avatar from "assets/img/avatars/avatar4.png";
 import { CookieStorage, CookieKeys } from "utils/cookies";
+import { UserContext } from "context/UserContext";
 
 const Navbar = (props) => {
   const { onOpenSidenav, brandText } = props;
   // const [darkmode, setDarkmode] = React.useState(false);
+
+  const { user } = React.useContext(UserContext);
 
   const handleLogout = () => {
     CookieStorage.remove(CookieKeys.AuthToken);
@@ -54,7 +56,7 @@ const Navbar = (props) => {
           <input
             type="text"
             placeholder="Search..."
-            class="block h-full w-full rounded-full bg-lightPrimary text-sm font-medium text-navy-700 outline-none placeholder:!text-gray-400 dark:bg-navy-900 dark:text-white dark:placeholder:!text-white sm:w-fit"
+            className="block h-full w-full rounded-full bg-lightPrimary text-sm font-medium text-navy-700 outline-none placeholder:!text-gray-400 dark:bg-navy-900 dark:text-white dark:placeholder:!text-white sm:w-fit"
           />
         </div>
         <span
@@ -135,8 +137,8 @@ const Navbar = (props) => {
         <Dropdown
           button={
             <img
-              className="h-10 w-10 rounded-full"
-              src={avatar}
+              className="h-10 w-10 cursor-pointer rounded-full"
+              src={`https://ui-avatars.com/api/?name=${user.name}&background=868CFF`}
               alt="Elon Musk"
             />
           }
@@ -145,25 +147,19 @@ const Navbar = (props) => {
               <div className="ml-4 mt-3">
                 <div className="flex items-center gap-2">
                   <p className="text-sm font-bold text-navy-700 dark:text-white">
-                    👋 Hey, Adela
+                    👋 Hey, {user.name}
                   </p>{" "}
                 </div>
               </div>
               <div className="mt-3 h-px w-full bg-gray-200 dark:bg-white/20 " />
 
               <div className="ml-4 mt-3 flex flex-col">
-                {/* <a
+                <a
                   href=" "
                   className="text-sm text-gray-800 dark:text-white hover:dark:text-white"
                 >
                   Profile Settings
                 </a>
-                <a
-                  href=" "
-                  className="mt-3 text-sm text-gray-800 dark:text-white hover:dark:text-white"
-                >
-                  Newsletter Settings
-                </a> */}
                 <div
                   className="mt-3 cursor-pointer text-sm font-medium text-red-500 hover:text-red-500"
                   onClick={handleLogout}

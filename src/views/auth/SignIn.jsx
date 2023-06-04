@@ -1,24 +1,26 @@
+import { useReducer, useContext } from "react";
 import InputField from "components/fields/InputField";
-// import { FcGoogle } from "react-icons/fc";
 import Checkbox from "components/checkbox";
-import { useReducer } from "react";
 import { useNavigate } from "react-router-dom";
 import { CookieStorage } from "utils/cookies";
 import { CookieKeys } from "utils/cookies";
-
-const dummyAccount = {
-  username: "admin",
-  password: "admin1234",
-};
+import { usePostLoginMutation } from "services/auth/post-login";
+import { Spinner } from "@chakra-ui/react";
+import { toast } from "react-toastify";
+import jwtDecode from "jwt-decode";
+import { UserContext } from "context/UserContext";
 
 export default function SignIn() {
   const navigate = useNavigate();
+  const { setUser } = useContext(UserContext);
+  const { mutate: loginMutate, isLoading: loginLoading } =
+    usePostLoginMutation();
   const [loginForm, setLoginForm] = useReducer(
     (prev, next) => {
       return { ...prev, ...next };
     },
     {
-      username: "",
+      email: "",
       password: "",
     }
   );
@@ -26,17 +28,39 @@ export default function SignIn() {
   const submitLogin = (e) => {
     e.preventDefault();
 
-    if (
-      loginForm.username === dummyAccount.username &&
-      loginForm.password === dummyAccount.password
-    ) {
-      CookieStorage.set(CookieKeys.AuthToken, "dummyToken");
-      navigate("/dashboard");
-      return;
-    }
+    loginMutate(loginForm, {
+      onSuccess: (res) => {
+        const token = res.data.data.token;
+        const decoded = jwtDecode(token);
+        const userData = {
+          id: decoded.id,
+          name: decoded.name,
+          email: decoded.email,
+          role: decoded.role,
+        };
 
-    alert("Invalid username or password!");
-    setLoginForm({ password: "" });
+        CookieStorage.set(CookieKeys.AuthToken, token, {
+          expires: new Date(decoded.exp * 1000),
+        });
+
+        CookieStorage.set(CookieKeys.User, userData, {
+          expires: new Date(decoded.exp * 1000),
+        });
+
+        setUser(userData);
+
+        toast.success("Login success!");
+        navigate("/dashboard", { replace: true });
+      },
+      onError: (err) => {
+        if (err.response.status === 401 || err.response.status === 500) {
+          toast.error("Invalid email or password");
+        }
+      },
+      onSettled: () => {
+        setLoginForm({ password: "" });
+      },
+    });
   };
 
   return (
@@ -49,33 +73,17 @@ export default function SignIn() {
         <h4 className="mb-2.5 text-4xl font-bold text-navy-700 dark:text-white">
           Login
         </h4>
-        {/* <p className="mb-9 ml-1 text-base text-gray-600">
-          Enter your email and password to sign in!
-        </p> */}
-        {/* <div className="mb-6 flex h-[50px] w-full items-center justify-center gap-2 rounded-xl bg-lightPrimary hover:cursor-pointer dark:bg-navy-800">
-          <div className="rounded-full text-xl">
-            <FcGoogle />
-          </div>
-          <h5 className="text-sm font-medium text-navy-700 dark:text-white">
-            Sign In with Google
-          </h5>
-        </div> */}
-        {/* <div className="mb-6 flex items-center  gap-3">
-          <div className="h-px w-full bg-gray-200 dark:bg-navy-700" />
-          <p className="text-base text-gray-600 dark:text-white"> or </p>
-          <div className="h-px w-full bg-gray-200 dark:bg-navy-700" />
-        </div> */}
         {/* Email */}
         <InputField
           variant="auth"
           extra="mb-3"
-          label="Username"
-          placeholder="username"
-          id="username"
-          type="text"
+          label="Email*"
+          placeholder="Email"
+          id="email"
+          type="email"
           required
-          onChange={(e) => setLoginForm({ username: e.target.value })}
-          value={loginForm.username}
+          onChange={(e) => setLoginForm({ email: e.target.value })}
+          value={loginForm.email}
         />
 
         {/* Password */}
@@ -110,7 +118,8 @@ export default function SignIn() {
           type="submit"
           className="linear mt-2 w-full rounded-xl bg-brand-500 py-[12px] text-base font-medium text-white transition duration-200 hover:bg-brand-600 active:bg-brand-700 dark:bg-brand-400 dark:text-white dark:hover:bg-brand-300 dark:active:bg-brand-200"
         >
-          Login
+          {loginLoading && <Spinner thickness="2px" speed="0.65s" size="xs" />}
+          {!loginLoading && <span>Login</span>}
         </button>
         {/* <div className="mt-4">
           <span className=" text-sm font-medium text-navy-700 dark:text-gray-600">
