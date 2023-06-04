@@ -231,7 +231,9 @@ const ProductModal = ({ isOpen, onClose, onSubmit, defaultValue }) => {
                       maxW="80px"
                       mr={2}
                     />
-                    <Text fontSize="sm">{file.name}</Text>
+                    <Text fontSize="sm">
+                      {file.image_path ? file.image_path : file.name}
+                    </Text>
                     <Button
                       colorScheme="red"
                       size="sm"
@@ -295,6 +297,9 @@ const ProductModal = ({ isOpen, onClose, onSubmit, defaultValue }) => {
                       mx="auto"
                     />
                   </Box>
+                  <Text textAlign="center" fontSize="sm" color="gray.600">
+                    {value.sketch.name ? value.sketch.name : value.sketch}
+                  </Text>
                   <Button
                     size="sm"
                     colorScheme="red"
@@ -304,9 +309,6 @@ const ProductModal = ({ isOpen, onClose, onSubmit, defaultValue }) => {
                   >
                     Remove
                   </Button>
-                  <Text textAlign="center" fontSize="sm" color="gray.600">
-                    {value.sketch.name}
-                  </Text>
                 </Box>
               )}
             </Box>

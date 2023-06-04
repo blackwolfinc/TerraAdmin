@@ -18,6 +18,7 @@ import { useUploadImagesProductMutation } from "services/product/post-images-pro
 import { useDeleteProductMutation } from "services/product/delete-product";
 import { useUpdateProductMutation } from "services/product/put-product";
 import { toast } from "react-toastify";
+import NoImage from "../../../../assets/img/no-image.jpg";
 
 const ProductTable = ({ columnsData }) => {
   const { data: fetchAllProducts, refetch: refetchAllProducts } =
@@ -269,7 +270,7 @@ const ProductTable = ({ columnsData }) => {
                             src={
                               cell?.value[0]
                                 ? `${process.env.REACT_APP_API_IMAGE}/${cell?.value[0]?.image_path}`
-                                : ""
+                                : NoImage
                             }
                             alt={`image-${index}`}
                           />
