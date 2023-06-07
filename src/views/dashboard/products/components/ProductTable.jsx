@@ -5,7 +5,7 @@ import {
   useSortBy,
   useTable,
 } from "react-table";
-import { Button, Image, useDisclosure } from "@chakra-ui/react";
+import { Button, Image, Tag, TagLabel, useDisclosure } from "@chakra-ui/react";
 import Card from "components/card";
 import { MdModeEditOutline } from "react-icons/md";
 import { HiTrash, HiEye } from "react-icons/hi";
@@ -115,6 +115,8 @@ const ProductTable = ({ columnsData }) => {
           title: value.title,
           description: value.description,
           specification: value?.specification,
+          category: value.category,
+          detailProduct: value.detailProduct,
         },
         {
           onSuccess: (response) => {
@@ -141,6 +143,8 @@ const ProductTable = ({ columnsData }) => {
             title: value.title,
             description: value.description,
             specification: value?.specification,
+            category: value.category,
+            detailProduct: value.detailProduct,
           },
         },
         {
@@ -178,6 +182,8 @@ const ProductTable = ({ columnsData }) => {
       specification: value.specification,
       sketch: value.image_denah_path,
       images: value.productImageSlides,
+      category: value.category,
+      detailProduct: value.detailProduct,
     };
     setEditProductData(newData);
     onOpen();
@@ -228,11 +234,11 @@ const ProductTable = ({ columnsData }) => {
                     {...column.getHeaderProps(column.getSortByToggleProps())}
                     key={index}
                     className={`${
-                      column.Header === "DETAIL" ||
-                      column.Header === "EDIT" ||
-                      column.Header === "DELETE"
-                        ? "w-[80px]"
-                        : "pr-14"
+                      (column.Header === "CATEGORY" && "w-[200px]") ||
+                      (column.Header === "DETAIL" && "w-[80px]") ||
+                      (column.Header === "EDIT" && "w-[80px]") ||
+                      (column.Header === "DELETE" && "w-[80px]") ||
+                      "pr-14"
                     } ${
                       column.Header === "IMAGES" ? "w-[150px]" : ""
                     } border-b border-gray-200 pb-[10px] text-start dark:!border-navy-700`}
@@ -280,6 +286,23 @@ const ProductTable = ({ columnsData }) => {
                       data = (
                         <p className="pr-14 text-sm font-bold text-navy-700 dark:text-white">
                           {cell.value}
+                        </p>
+                      );
+                    } else if (cell.column.Header === "CATEGORY") {
+                      data = (
+                        <p className="pr-14 text-sm font-semibold text-navy-700 dark:text-white">
+                          <Tag
+                            size="sm"
+                            borderRadius="full"
+                            variant="solid"
+                            colorScheme={
+                              (cell.value === "BIG_SALE" && "red") ||
+                              (cell.value === "SUPER_DEAL" && "blue") ||
+                              (cell.value === "STANDARD" && "yellow")
+                            }
+                          >
+                            <TagLabel>{cell.value}</TagLabel>
+                          </Tag>
                         </p>
                       );
                     } else if (cell.column.Header === "DETAIL") {

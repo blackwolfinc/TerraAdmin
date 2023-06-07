@@ -18,9 +18,11 @@ import {
   Flex,
   ModalCloseButton,
   FormErrorMessage,
+  Select,
 } from "@chakra-ui/react";
 import { MdFileUpload, MdDelete } from "react-icons/md";
 import { GoPlus } from "react-icons/go";
+import Quill from "components/quill";
 
 const ProductModal = ({ isOpen, onClose, onSubmit, defaultValue }) => {
   const [isError, setIsError] = React.useState(false);
@@ -30,6 +32,8 @@ const ProductModal = ({ isOpen, onClose, onSubmit, defaultValue }) => {
     specification: [""],
     sketch: null,
     images: [],
+    category: "",
+    detailProduct: "<p></p>",
     ...defaultValue,
   });
 
@@ -50,6 +54,8 @@ const ProductModal = ({ isOpen, onClose, onSubmit, defaultValue }) => {
       specification: [""],
       sketch: null,
       images: [],
+      category: "",
+      detailProduct: "<p></p>",
     });
     onClose();
   };
@@ -65,7 +71,12 @@ const ProductModal = ({ isOpen, onClose, onSubmit, defaultValue }) => {
     );
 
     // Check Required
-    if (value.title && value.description && newSpecification.length > 0) {
+    if (
+      value.title.length > 0 &&
+      value.description.length > 0 &&
+      newSpecification.length > 0 &&
+      value.category.length > 0
+    ) {
       onSubmit({
         id: value.id || null,
         title: value.title,
@@ -73,6 +84,8 @@ const ProductModal = ({ isOpen, onClose, onSubmit, defaultValue }) => {
         specification: newSpecification,
         sketch: newSketch,
         images: newImages,
+        category: value.category,
+        detailProduct: value.detailProduct,
       });
       setValue({
         title: "",
@@ -80,6 +93,8 @@ const ProductModal = ({ isOpen, onClose, onSubmit, defaultValue }) => {
         specification: [""],
         sketch: null,
         images: [],
+        category: "",
+        detailProduct: "<p></p>",
       });
       onClose();
     } else {
@@ -179,7 +194,32 @@ const ProductModal = ({ isOpen, onClose, onSubmit, defaultValue }) => {
               <FormErrorMessage>Specification is required.</FormErrorMessage>
             )}
           </FormControl>
-          <FormControl isRequired mt={4}>
+          <FormControl isRequired mt={4} isInvalid={isError}>
+            <FormLabel>Category</FormLabel>
+            <Select
+              placeholder="Select Category"
+              name="role"
+              value={value.category}
+              onChange={(e) => setValue({ ...value, category: e.target.value })}
+            >
+              <option value="BIG_SALE">Big Sale</option>
+              <option value="SUPER_DEAL">Super Deal</option>
+              <option value="STANDARD">Standard</option>
+            </Select>
+            {isError && (
+              <FormErrorMessage>Category is required.</FormErrorMessage>
+            )}
+          </FormControl>
+          <FormControl mt={4}>
+            <FormLabel>Detail Product</FormLabel>
+            <Box className={isError ? "border-2 border-red-500" : ""}>
+              <Quill
+                value={value.detailProduct}
+                onChange={(e) => setValue({ ...value, detailProduct: e })}
+              />
+            </Box>
+          </FormControl>
+          <FormControl mt={4}>
             <FormLabel>Images</FormLabel>
             <Box
               className="col-span-5 h-full w-full rounded-xl bg-lightPrimary dark:!bg-navy-700 2xl:col-span-6"
@@ -254,7 +294,7 @@ const ProductModal = ({ isOpen, onClose, onSubmit, defaultValue }) => {
               </Stack>
             </Box>
           </FormControl>
-          <FormControl isRequired mt={4}>
+          <FormControl mt={4}>
             <FormLabel>Sketch</FormLabel>
             <Box
               className="col-span-5 h-full w-full rounded-xl bg-lightPrimary dark:!bg-navy-700 2xl:col-span-6"
