@@ -370,6 +370,7 @@ const ProductTable = ({ columnsData }) => {
         onClose={onClose}
         onSubmit={handleSubmitProduct}
         defaultValue={editProductData}
+        refetchAllProducts={refetchAllProducts}
       />
       <ProductDelete data={deleteProductData} onSubmit={handleDeleteProduct} />
     </Card>

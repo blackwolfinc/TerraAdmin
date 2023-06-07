@@ -23,8 +23,18 @@ import {
 import { MdFileUpload, MdDelete } from "react-icons/md";
 import { GoPlus } from "react-icons/go";
 import Quill from "components/quill";
+import { useDeleteImagesProductMutation } from "services/product/delete-images-product";
+import { toast } from "react-toastify";
 
-const ProductModal = ({ isOpen, onClose, onSubmit, defaultValue }) => {
+const ProductModal = ({
+  isOpen,
+  onClose,
+  onSubmit,
+  defaultValue,
+  refetchAllProducts,
+}) => {
+  const { mutate: deleteImages } = useDeleteImagesProductMutation();
+
   const [isError, setIsError] = React.useState(false);
   const [value, setValue] = React.useState({
     title: "",
@@ -100,6 +110,25 @@ const ProductModal = ({ isOpen, onClose, onSubmit, defaultValue }) => {
     } else {
       setIsError(true);
     }
+  };
+
+  const handleDeleteImage = (file) => {
+    if (file?.id) {
+      deleteImages(file.id, {
+        onSuccess: () => {
+          refetchAllProducts();
+          toast.success("Delete image success!");
+        },
+        onError: (err) => {
+          toast.error("Delete image failed!");
+        },
+      });
+    }
+
+    setValue({
+      ...value,
+      images: value.images.filter((selectedFile) => selectedFile !== file),
+    });
   };
 
   return (
@@ -212,12 +241,10 @@ const ProductModal = ({ isOpen, onClose, onSubmit, defaultValue }) => {
           </FormControl>
           <FormControl mt={4}>
             <FormLabel>Detail Product</FormLabel>
-            <Box className={isError ? "border-2 border-red-500" : ""}>
-              <Quill
-                value={value.detailProduct}
-                onChange={(e) => setValue({ ...value, detailProduct: e })}
-              />
-            </Box>
+            <Quill
+              value={value.detailProduct}
+              onChange={(e) => setValue({ ...value, detailProduct: e })}
+            />
           </FormControl>
           <FormControl mt={4}>
             <FormLabel>Images</FormLabel>
@@ -234,7 +261,7 @@ const ProductModal = ({ isOpen, onClose, onSubmit, defaultValue }) => {
                   Upload Files
                 </Text>
                 <Text className="mt-2 text-sm font-medium text-gray-600">
-                  PNG and JPG files are allowed
+                  PNG, JPG and JPEG files are allowed (Max 2MB)
                 </Text>
                 <input
                   id="multiple-upload"
@@ -277,14 +304,7 @@ const ProductModal = ({ isOpen, onClose, onSubmit, defaultValue }) => {
                     <Button
                       colorScheme="red"
                       size="sm"
-                      onClick={() =>
-                        setValue({
-                          ...value,
-                          images: value.images.filter(
-                            (selectedFile) => selectedFile !== file
-                          ),
-                        })
-                      }
+                      onClick={() => handleDeleteImage(file)}
                       ml="auto"
                     >
                       <MdDelete />
@@ -310,7 +330,7 @@ const ProductModal = ({ isOpen, onClose, onSubmit, defaultValue }) => {
                     Upload File
                   </Text>
                   <Text className="mt-2 text-sm font-medium text-gray-600">
-                    PNG and JPG files are allowed
+                    PNG, JPG and JPEG files are allowed (Max 2MB)
                   </Text>
                   <input
                     id="single-upload"
