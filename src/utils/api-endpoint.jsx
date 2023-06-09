@@ -20,5 +20,11 @@ export const API_ENDPOINT = {
   POST_PARTNER: "/partner",
   POST_PARTNER_IMAGE: "/partner/image/upload/",
   PATCH_PARTNER: "/partner/",
-  DELETE_PARTNER: "/partner/"
+  DELETE_PARTNER: "/partner/",
+  // BLOG
+  GET_BLOG: "/blog",
+  POST_BLOG: "/blog",
+  PATCH_BLOG: "/blog",
+  DELETE_BLOG: "/blog",
+  POST_IMAGE_BLOG: "/blog/image/upload/",
 };

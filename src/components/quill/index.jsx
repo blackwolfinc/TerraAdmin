@@ -1,6 +1,9 @@
 import React from "react";
-import ReactQuill from "react-quill";
+import ReactQuill, { Quill as Q } from "react-quill";
+import ImageResize from "quill-image-resize-module-react";
 import "react-quill/dist/quill.snow.css";
+
+Q.register("modules/imageResize", ImageResize);
 
 const modules = {
   toolbar: [
@@ -16,6 +19,14 @@ const modules = {
     ["link", "image"],
     ["clean"],
   ],
+  clipboard: {
+    // toggle to add extra line breaks when pasting HTML:
+    matchVisual: false,
+  },
+  imageResize: {
+    parchment: Q.import("parchment"),
+    modules: ["Resize", "DisplaySize"],
+  },
 };
 
 const Quill = (props) => {
