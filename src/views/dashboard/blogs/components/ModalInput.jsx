@@ -123,8 +123,10 @@ const ModalInput = ({
               onClick={() => {
                 if (onSubmit) onSubmit(value);
               }}
-              disabled={isLoading}
-              className="rounded-xl bg-brand-500 px-5 py-3 text-sm font-medium text-white transition duration-200 hover:bg-brand-600 active:bg-brand-700 dark:bg-brand-400 dark:text-white dark:hover:bg-brand-300 dark:active:bg-brand-200"
+              disabled={
+                isLoading || !value.title || !value.image || !value.body
+              }
+              className="rounded-xl bg-brand-500 px-5 py-3 text-sm font-medium text-white transition duration-200 hover:bg-brand-600 active:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-brand-400 dark:text-white dark:hover:bg-brand-300 dark:active:bg-brand-200"
             >
               Save
             </button>
