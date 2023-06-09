@@ -1,42 +1,144 @@
 import React from "react";
 import Card from "components/card";
 import ModalInput from "./components/ModalInput";
-import ModalEdit from "./components/ModalEdit";
 import ModalDelete from "./components/ModalDelete";
 
 // dummy data
-import { DummyBlog } from "./variables/dummyBlog";
 import BlogsTable from "./components/BlogsTable";
+import { useBlogDataQuery } from "services/blogs/get-blogs";
+import { useCreateBlogMutation } from "services/blogs/post-blogs";
+import { toast } from "react-toastify";
+import { useUploadImagesBlogMutation } from "services/blogs/post-images-blog";
+import { convertToSlug } from "utils/convertToSlug";
+import { useEditBlogMutation } from "services/blogs/patch-blogs";
+import { useDeleteBlogMutation } from "services/blogs/delete-blogs";
 
 const Blogs = () => {
+  // state
   const [isModalCreateOpen, setIsModalCreateOpen] = React.useState(false);
   const [isModalEditOpen, setIsModalEditOpen] = React.useState(false);
   const [modalEditValue, setModalEditValue] = React.useState(null);
   const [isModalDeleteOpen, setIsModalDeleteOpen] = React.useState(false);
-  const [deletedTitle, setDeletedTitle] = React.useState("");
+  const [deletedValue, setDeletedValue] = React.useState(null);
+
+  // API
+  const { mutate: createBlog, isLoading: createBlogIsLoading } =
+    useCreateBlogMutation();
+  const { mutate: uploadImagesBlog, isLoading: uploadImagesBlogIsLoading } =
+    useUploadImagesBlogMutation();
+  const { mutate: editBlog, isLoading: editBlogIsLoading } =
+    useEditBlogMutation();
+  const { mutate: deleteBlog, isLoading: deleteBlogIsLoading } =
+    useDeleteBlogMutation();
+  const {
+    data: blogsData,
+    isLoading: blogsIsLoading,
+    refetch: refetchBlog,
+  } = useBlogDataQuery();
+  const blogDataRow = blogsData?.data.datas || [];
 
   const handleOpenEdit = (id) => {
-    const data = DummyBlog.find((blog) => blog.id === id);
+    const data = blogDataRow?.find((blog) => blog.id === id);
     setModalEditValue(data);
 
     setIsModalEditOpen(true);
   };
 
-  const handleCloseEdit = () => {
-    setModalEditValue(null);
-    setIsModalEditOpen(false);
-  };
-
   const handleOpenDelete = (id) => {
-    const data = DummyBlog.find((blog) => blog.id === id);
-    setDeletedTitle(
-      <p className="font-normal">
-        Are you sure you want to delete{" "}
-        <span className="font-bold">{data.title} ?</span>
-      </p>
-    );
+    const data = blogDataRow?.find((blog) => blog.id === id);
+    setDeletedValue(data);
 
     setIsModalDeleteOpen(true);
+  };
+
+  const handlePostBlog = (data) => {
+    const postData = {
+      title: data.title,
+      slug: convertToSlug(data.title),
+      description: "Blog Description",
+      body: data.body,
+    };
+
+    createBlog(postData, {
+      onSuccess: (res) => {
+        toast.success("Blog berhasil ditambahkan");
+        handlePostThumbnail(res.data.data.id, data.image);
+      },
+      onError: (error) => {
+        toast.error(
+          error?.response?.data?.message || "Gagal menambahkan blog!"
+        );
+      },
+    });
+  };
+
+  const handlePostThumbnail = (id, image) => {
+    const formData = new FormData();
+    formData.append("image", image);
+
+    uploadImagesBlog(
+      {
+        id,
+        data: formData,
+      },
+      {
+        onSuccess: () => {
+          toast.success("Thumbnail berhasil ditambahkan");
+        },
+        onError: (error) => {
+          toast.error(
+            error?.response?.data?.message || "Gagal menambahkan thumbnail!"
+          );
+        },
+        onSettled: () => {
+          refetchBlog();
+          setIsModalCreateOpen(false);
+        },
+      }
+    );
+  };
+
+  const handleEditBlog = (data) => {
+    const editData = {
+      title: data.title,
+      slug: convertToSlug(data.title),
+      description: "Blog Description",
+      body: data.body,
+    };
+
+    editBlog(
+      {
+        id: modalEditValue.id,
+        data: editData,
+      },
+      {
+        onSuccess: () => {
+          toast.success("Blog berhasil diubah");
+        },
+        onError: (error) => {
+          toast.error(error?.response?.data?.message || "Gagal mengubah blog!");
+        },
+        onSettled: () => {
+          setIsModalEditOpen(false);
+          refetchBlog();
+        },
+      }
+    );
+  };
+
+  const handleDeleteBlog = (id) => {
+    deleteBlog(id, {
+      onSuccess: () => {
+        toast.success("Blog berhasil dihapus");
+      },
+      onError: (error) => {
+        toast.error(error?.response?.data?.message || "Gagal menghapus blog!");
+      },
+      onSettled: () => {
+        refetchBlog();
+        setIsModalDeleteOpen(false);
+      },
+    });
   };
 
   return (
@@ -44,19 +146,23 @@ const Blogs = () => {
       {/* Create New Modal */}
       <ModalInput
         isOpen={isModalCreateOpen}
+        onSubmit={handlePostBlog}
+        isLoading={createBlogIsLoading || uploadImagesBlogIsLoading}
         onClose={() => setIsModalCreateOpen(false)}
       />
       {/* Edit Modal */}
-      <ModalEdit
+      <ModalInput
         title="Edit Blog"
         isOpen={isModalEditOpen}
-        onClose={handleCloseEdit}
+        onClose={() => setIsModalEditOpen(false)}
+        onSubmit={handleEditBlog}
         initialValue={modalEditValue}
       />
       {/* Delete Modal */}
       <ModalDelete
-        title={deletedTitle}
+        title={`${deletedValue?.title || ""}`}
         isOpen={isModalDeleteOpen}
+        onSubmit={() => handleDeleteBlog(deletedValue?.id)}
         onClose={() => setIsModalDeleteOpen(false)}
       />
       {/* Main */}
@@ -73,7 +179,7 @@ const Blogs = () => {
           </button>
         </div>
         <BlogsTable
-          tableData={DummyBlog}
+          tableData={blogDataRow || []}
           onDetail={(id) => console.log(`Lihat detail product ${id}`)}
           onEdit={handleOpenEdit}
           onDelete={handleOpenDelete}

@@ -9,4 +9,9 @@ export const API_ENDPOINT = {
   CREATE_USER: "/user/",
   UPDATE_USER: "/user/",
   DELETE_USER: "/user/",
+  GET_BLOG: "/blog",
+  POST_BLOG: "/blog",
+  PATCH_BLOG: "/blog",
+  DELETE_BLOG: "/blog",
+  POST_IMAGE_BLOG: "/blog/image/upload/",
 };
