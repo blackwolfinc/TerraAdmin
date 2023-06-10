@@ -1,9 +1,8 @@
 import React from "react";
 import Card from "components/card";
+import { Spinner } from "@chakra-ui/react";
 import ModalInput from "./components/ModalInput";
 import ModalDelete from "./components/ModalDelete";
-
-// dummy data
 import BlogsTable from "./components/BlogsTable";
 import { useBlogDataQuery } from "services/blogs/get-blogs";
 import { useCreateBlogMutation } from "services/blogs/post-blogs";
@@ -28,8 +27,7 @@ const Blogs = () => {
     useUploadImagesBlogMutation();
   const { mutate: editBlog, isLoading: editBlogIsLoading } =
     useEditBlogMutation();
-  const { mutate: deleteBlog, isLoading: deleteBlogIsLoading } =
-    useDeleteBlogMutation();
+  const { mutate: deleteBlog } = useDeleteBlogMutation();
   const {
     data: blogsData,
     isLoading: blogsIsLoading,
@@ -154,6 +152,7 @@ const Blogs = () => {
       <ModalInput
         title="Edit Blog"
         isOpen={isModalEditOpen}
+        isLoading={editBlogIsLoading}
         onClose={() => setIsModalEditOpen(false)}
         onSubmit={handleEditBlog}
         initialValue={modalEditValue}
@@ -178,12 +177,26 @@ const Blogs = () => {
             ADD
           </button>
         </div>
-        <BlogsTable
-          tableData={blogDataRow || []}
-          onDetail={(id) => console.log(`Lihat detail product ${id}`)}
-          onEdit={handleOpenEdit}
-          onDelete={handleOpenDelete}
-        />
+        {blogsIsLoading && (
+          <div className="my-4 flex items-center justify-center">
+            <Spinner />
+          </div>
+        )}
+        {!blogsIsLoading && blogDataRow?.length === 0 && (
+          <div className="my-4 flex items-center justify-center">
+            <div className="text-lg font-bold text-gray-400">
+              Belum ada data blog
+            </div>
+          </div>
+        )}
+        {!blogsIsLoading && blogDataRow?.length > 0 && (
+          <BlogsTable
+            tableData={blogDataRow || []}
+            onDetail={(id) => console.log(`Lihat detail product ${id}`)}
+            onEdit={handleOpenEdit}
+            onDelete={handleOpenDelete}
+          />
+        )}
       </Card>
     </>
   );

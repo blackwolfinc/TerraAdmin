@@ -7,6 +7,7 @@ import {
   ModalCloseButton,
   ModalBody,
   ModalFooter,
+  Spinner,
 } from "@chakra-ui/react";
 import { MdFileUpload } from "react-icons/md";
 import InputField from "components/fields/InputField";
@@ -60,6 +61,13 @@ const ModalInput = ({
     >
       <ModalOverlay />
       <ModalContent>
+        {isLoading && (
+          <div className="absolute z-10 h-full w-full bg-[#000]/20">
+            <div className="flex h-full w-full items-center justify-center">
+              <Spinner />
+            </div>
+          </div>
+        )}
         <ModalHeader>{title}</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
@@ -132,14 +140,14 @@ const ModalInput = ({
             </button>
             <button
               disabled={isLoading}
-              className="rounded-xl bg-red-500 px-5 py-3 text-sm font-medium text-white transition duration-200 hover:bg-red-600 active:bg-red-700 dark:bg-red-400 dark:text-white dark:hover:bg-red-300 dark:active:bg-red-200"
+              className="rounded-xl bg-red-500 px-5 py-3 text-sm font-medium text-white transition duration-200 hover:bg-red-600 active:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-red-400 dark:text-white dark:hover:bg-red-300 dark:active:bg-red-200"
               onClick={clear}
             >
               Clear
             </button>
             <button
               disabled={isLoading}
-              className="rounded-xl bg-gray-100 px-5 py-3 text-sm font-medium text-navy-700 transition duration-200 hover:bg-gray-200 active:bg-gray-300 dark:bg-white/10 dark:text-white dark:hover:bg-white/20 dark:active:bg-white/30"
+              className="rounded-xl bg-gray-100 px-5 py-3 text-sm font-medium text-navy-700 transition duration-200 hover:bg-gray-200 active:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-white/10 dark:text-white dark:hover:bg-white/20 dark:active:bg-white/30"
               onClick={onClose}
             >
               Close
