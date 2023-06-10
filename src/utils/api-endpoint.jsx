@@ -28,4 +28,10 @@ export const API_ENDPOINT = {
   PATCH_BLOG: "/blog",
   DELETE_BLOG: "/blog",
   POST_IMAGE_BLOG: "/blog/image/upload/",
+  //PROMO
+  GET_PROMO: "/promo",
+  POST_PROMO: "/promo",
+  PATCH_PROMO: "/promo",
+  DELETE_PROMO: "/promo",
+  POST_IMAGE_PROMO: "/promo/image/upload/",
 };
