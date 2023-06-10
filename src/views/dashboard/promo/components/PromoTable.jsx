@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { Button } from "@chakra-ui/react";
+import { Button, Tag, TagLabel } from "@chakra-ui/react";
 import { MdModeEditOutline } from "react-icons/md";
 import { HiTrash } from "react-icons/hi";
 import NoImage from "assets/img/no-image.jpg";
@@ -146,9 +146,17 @@ const PromoTable = ({ tableData, onEdit, onDelete }) => {
                     );
                   } else if (cell.column.Header === "CATEGORY") {
                     data = (
-                      <p className="pr-14 text-sm font-bold text-navy-700 dark:text-white">
-                        {cell.value || "-"}
-                      </p>
+                      <Tag
+                        size="sm"
+                        borderRadius="full"
+                        variant="solid"
+                        colorScheme={
+                          (cell.value === "SPECIAL" && "orange") ||
+                          (cell.value === "STANDARD" && "blue")
+                        }
+                      >
+                        <TagLabel>{cell.value}</TagLabel>
+                      </Tag>
                     );
                   } else if (cell.column.Header === "EDIT") {
                     data = (
