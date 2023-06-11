@@ -7,6 +7,7 @@ import Partners from "views/dashboard/partners";
 import Products from "views/dashboard/products";
 import Users from "views/dashboard/users";
 import Blogs from "views/dashboard/blogs";
+import Promo from "views/dashboard/promo";
 
 // Icon Imports
 import {
@@ -15,6 +16,7 @@ import {
   MdInsertPhoto,
   MdNewspaper,
   MdPerson,
+  MdRedeem,
   MdHandshake,
 } from "react-icons/md";
 
@@ -39,6 +41,14 @@ const dashboardRoutes = [
     path: "product",
     icon: <MdOutlineShoppingCart className="h-6 w-6" />,
     component: <Products />,
+    secondary: true,
+  },
+  {
+    name: "Promo",
+    layout: "/dashboard",
+    path: "promo",
+    icon: <MdRedeem className="h-6 w-6" />,
+    component: <Promo />,
     secondary: true,
   },
   {

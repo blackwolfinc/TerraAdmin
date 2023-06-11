@@ -9,7 +9,7 @@ import {
   Button,
 } from "@chakra-ui/react";
 
-const ModalDelete = ({ isOpen, title, onSubmit, onClose, ...rest }) => {
+const ModalDeletePromo = ({ isOpen, title, onSubmit, onClose, ...rest }) => {
   return (
     <Modal
       isOpen={isOpen}
@@ -49,4 +49,4 @@ const ModalDelete = ({ isOpen, title, onSubmit, onClose, ...rest }) => {
   );
 };
 
-export default ModalDelete;
+export default ModalDeletePromo;

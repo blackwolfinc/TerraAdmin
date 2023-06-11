@@ -4,6 +4,7 @@ export const API_ENDPOINT = {
   CREATE_PRODUCT: "/product/",
   UPLOAD_SKETCH_PRODUCT: "/product/image/denah/upload/",
   UPLOAD_IMAGES_PRODUCT: "/product/image/slide/upload/",
+  DELETE_IMAGES_PRODUCT: "/product/image/slide/",
   DELETE_PRODUCT: "/product/",
   GET_ALL_USERS: "/user/",
   CREATE_USER: "/user/",
@@ -14,5 +15,23 @@ export const API_ENDPOINT = {
   POST_GALLERY_TITLE: "/gallery",
   POST_GALLERY_IMAGE: "/gallery/image/upload/",
   PATCH_GALLERY_TITLE: "/gallery/",
-  DELETE_GALLERY: "/gallery/"
+  DELETE_GALLERY: "/gallery/",
+  //PARTNER
+  GET_ALL_PARTNER: "/partner",
+  POST_PARTNER: "/partner",
+  POST_PARTNER_IMAGE: "/partner/image/upload/",
+  PATCH_PARTNER: "/partner/",
+  DELETE_PARTNER: "/partner/",
+  // BLOG
+  GET_BLOG: "/blog",
+  POST_BLOG: "/blog",
+  PATCH_BLOG: "/blog",
+  DELETE_BLOG: "/blog",
+  POST_IMAGE_BLOG: "/blog/image/upload/",
+  //PROMO
+  GET_PROMO: "/promo",
+  POST_PROMO: "/promo",
+  PATCH_PROMO: "/promo",
+  DELETE_PROMO: "/promo",
+  POST_IMAGE_PROMO: "/promo/image/upload/",
 };

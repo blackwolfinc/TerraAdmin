@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
-import { Button } from "@chakra-ui/react";
+import { Button, Tag, TagLabel } from "@chakra-ui/react";
 import { MdModeEditOutline } from "react-icons/md";
-import { HiTrash, HiEye } from "react-icons/hi";
+import { HiTrash } from "react-icons/hi";
 import NoImage from "assets/img/no-image.jpg";
 
 import {
@@ -13,21 +13,17 @@ import {
 
 const columnsData = [
   {
-    Header: "THUMBNAIL",
+    Header: "IMAGE",
     accessor: "image",
+    disableSortBy: true,
   },
   {
     Header: "TITLE",
     accessor: "title",
   },
   {
-    Header: "CREATOR",
-    accessor: "createdBy",
-  },
-  {
-    Header: "LIHAT",
-    accessor: "progress",
-    disableSortBy: true,
+    Header: "CATEGORY",
+    accessor: "category",
   },
   {
     id: "edit",
@@ -43,7 +39,7 @@ const columnsData = [
   },
 ];
 
-const BlogsTable = ({ tableData, onEdit, onDelete }) => {
+const PromoTable = ({ tableData, onEdit, onDelete }) => {
   const columns = columnsData;
   const data = useMemo(() => tableData, [tableData]);
 
@@ -68,7 +64,7 @@ const BlogsTable = ({ tableData, onEdit, onDelete }) => {
   initialState.pageSize = 11;
 
   return (
-    <div class="h-full overflow-x-scroll xl:overflow-x-hidden">
+    <div className="h-full overflow-x-scroll xl:overflow-x-hidden">
       <table
         {...getTableProps()}
         className="w-full"
@@ -85,22 +81,20 @@ const BlogsTable = ({ tableData, onEdit, onDelete }) => {
                   {...column.getHeaderProps(column.getSortByToggleProps())}
                   key={index}
                   className={`border-b border-gray-200 pb-[10px] text-center dark:!border-navy-700 ${
-                    column.Header === "LIHAT" ||
-                    column.Header === "EDIT" ||
-                    column.Header === "DELETE"
+                    column.Header === "EDIT" || column.Header === "DELETE"
                       ? "w-20 px-6"
                       : ""
                   } ${
-                    column.Header === "TITLE" || column.Header === "CREATOR"
+                    column.Header === "TITLE" ||
+                    column.Header === "CREATOR" ||
+                    column.Header === "CATEGORY"
                       ? "min-w-[160px]"
                       : ""
-                  } ${column.Header === "THUMBNAIL" ? "w-40" : ""}`}
+                  } ${column.Header === "IMAGE" ? "w-40" : ""}`}
                 >
                   <div
                     className={`${
-                      column.Header === "LIHAT" ||
-                      column.Header === "EDIT" ||
-                      column.Header === "DELETE"
+                      column.Header === "EDIT" || column.Header === "DELETE"
                         ? "justify-center"
                         : ""
                     } flex w-full text-xs tracking-wide text-gray-600`}
@@ -119,7 +113,7 @@ const BlogsTable = ({ tableData, onEdit, onDelete }) => {
               <tr {...row.getRowProps()} key={index}>
                 {row.cells.map((cell, index) => {
                   let data = "";
-                  if (cell.column.Header === "THUMBNAIL") {
+                  if (cell.column.Header === "IMAGE") {
                     data = (
                       <div className="mr-14 flex aspect-video h-20 w-fit items-center justify-center overflow-hidden rounded-lg">
                         {!cell.value && (
@@ -150,22 +144,19 @@ const BlogsTable = ({ tableData, onEdit, onDelete }) => {
                         {cell.value || "-"}
                       </p>
                     );
-                  } else if (cell.column.Header === "LIHAT") {
+                  } else if (cell.column.Header === "CATEGORY") {
                     data = (
-                      <div className="flex justify-center text-gray-700 dark:text-white">
-                        <Button
-                          onClick={() =>
-                            window.open(
-                              `/product/${cell.row.original.id}`,
-                              "_blank"
-                            )
-                          }
-                          colorScheme="gray"
-                          size="sm"
-                        >
-                          <HiEye />
-                        </Button>
-                      </div>
+                      <Tag
+                        size="sm"
+                        borderRadius="full"
+                        variant="solid"
+                        colorScheme={
+                          (cell.value === "SPECIAL" && "orange") ||
+                          (cell.value === "STANDARD" && "blue")
+                        }
+                      >
+                        <TagLabel>{cell.value}</TagLabel>
+                      </Tag>
                     );
                   } else if (cell.column.Header === "EDIT") {
                     data = (
@@ -211,4 +202,4 @@ const BlogsTable = ({ tableData, onEdit, onDelete }) => {
   );
 };
 
-export default BlogsTable;
+export default PromoTable;

@@ -18,11 +18,23 @@ import {
   Flex,
   ModalCloseButton,
   FormErrorMessage,
+  Select,
 } from "@chakra-ui/react";
 import { MdFileUpload, MdDelete } from "react-icons/md";
 import { GoPlus } from "react-icons/go";
+import Quill from "components/quill";
+import { useDeleteImagesProductMutation } from "services/product/delete-images-product";
+import { toast } from "react-toastify";
 
-const ProductModal = ({ isOpen, onClose, onSubmit, defaultValue }) => {
+const ProductModal = ({
+  isOpen,
+  onClose,
+  onSubmit,
+  defaultValue,
+  refetchAllProducts,
+}) => {
+  const { mutate: deleteImages } = useDeleteImagesProductMutation();
+
   const [isError, setIsError] = React.useState(false);
   const [value, setValue] = React.useState({
     title: "",
@@ -30,6 +42,8 @@ const ProductModal = ({ isOpen, onClose, onSubmit, defaultValue }) => {
     specification: [""],
     sketch: null,
     images: [],
+    category: "",
+    detailProduct: "<p></p>",
     ...defaultValue,
   });
 
@@ -50,6 +64,8 @@ const ProductModal = ({ isOpen, onClose, onSubmit, defaultValue }) => {
       specification: [""],
       sketch: null,
       images: [],
+      category: "",
+      detailProduct: "<p></p>",
     });
     onClose();
   };
@@ -65,7 +81,12 @@ const ProductModal = ({ isOpen, onClose, onSubmit, defaultValue }) => {
     );
 
     // Check Required
-    if (value.title && value.description && newSpecification.length > 0) {
+    if (
+      value.title.length > 0 &&
+      value.description.length > 0 &&
+      newSpecification.length > 0 &&
+      value.category.length > 0
+    ) {
       onSubmit({
         id: value.id || null,
         title: value.title,
@@ -73,6 +94,8 @@ const ProductModal = ({ isOpen, onClose, onSubmit, defaultValue }) => {
         specification: newSpecification,
         sketch: newSketch,
         images: newImages,
+        category: value.category,
+        detailProduct: value.detailProduct,
       });
       setValue({
         title: "",
@@ -80,11 +103,32 @@ const ProductModal = ({ isOpen, onClose, onSubmit, defaultValue }) => {
         specification: [""],
         sketch: null,
         images: [],
+        category: "",
+        detailProduct: "<p></p>",
       });
       onClose();
     } else {
       setIsError(true);
     }
+  };
+
+  const handleDeleteImage = (file) => {
+    if (file?.id) {
+      deleteImages(file.id, {
+        onSuccess: () => {
+          refetchAllProducts();
+          toast.success("Delete image success!");
+        },
+        onError: (err) => {
+          toast.error("Delete image failed!");
+        },
+      });
+    }
+
+    setValue({
+      ...value,
+      images: value.images.filter((selectedFile) => selectedFile !== file),
+    });
   };
 
   return (
@@ -179,7 +223,30 @@ const ProductModal = ({ isOpen, onClose, onSubmit, defaultValue }) => {
               <FormErrorMessage>Specification is required.</FormErrorMessage>
             )}
           </FormControl>
-          <FormControl isRequired mt={4}>
+          <FormControl isRequired mt={4} isInvalid={isError}>
+            <FormLabel>Category</FormLabel>
+            <Select
+              placeholder="Select Category"
+              name="role"
+              value={value.category}
+              onChange={(e) => setValue({ ...value, category: e.target.value })}
+            >
+              <option value="BIG_SALE">Big Sale</option>
+              <option value="SUPER_DEAL">Super Deal</option>
+              <option value="STANDARD">Standard</option>
+            </Select>
+            {isError && (
+              <FormErrorMessage>Category is required.</FormErrorMessage>
+            )}
+          </FormControl>
+          <FormControl mt={4}>
+            <FormLabel>Detail Product</FormLabel>
+            <Quill
+              value={value.detailProduct}
+              onChange={(e) => setValue({ ...value, detailProduct: e })}
+            />
+          </FormControl>
+          <FormControl mt={4}>
             <FormLabel>Images</FormLabel>
             <Box
               className="col-span-5 h-full w-full rounded-xl bg-lightPrimary dark:!bg-navy-700 2xl:col-span-6"
@@ -194,7 +261,7 @@ const ProductModal = ({ isOpen, onClose, onSubmit, defaultValue }) => {
                   Upload Files
                 </Text>
                 <Text className="mt-2 text-sm font-medium text-gray-600">
-                  PNG and JPG files are allowed
+                  PNG, JPG and JPEG files are allowed (Max 2MB)
                 </Text>
                 <input
                   id="multiple-upload"
@@ -231,18 +298,13 @@ const ProductModal = ({ isOpen, onClose, onSubmit, defaultValue }) => {
                       maxW="80px"
                       mr={2}
                     />
-                    <Text fontSize="sm">{file.name}</Text>
+                    <Text fontSize="sm">
+                      {file.image_path ? file.image_path : file.name}
+                    </Text>
                     <Button
                       colorScheme="red"
                       size="sm"
-                      onClick={() =>
-                        setValue({
-                          ...value,
-                          images: value.images.filter(
-                            (selectedFile) => selectedFile !== file
-                          ),
-                        })
-                      }
+                      onClick={() => handleDeleteImage(file)}
                       ml="auto"
                     >
                       <MdDelete />
@@ -252,7 +314,7 @@ const ProductModal = ({ isOpen, onClose, onSubmit, defaultValue }) => {
               </Stack>
             </Box>
           </FormControl>
-          <FormControl isRequired mt={4}>
+          <FormControl mt={4}>
             <FormLabel>Sketch</FormLabel>
             <Box
               className="col-span-5 h-full w-full rounded-xl bg-lightPrimary dark:!bg-navy-700 2xl:col-span-6"
@@ -268,7 +330,7 @@ const ProductModal = ({ isOpen, onClose, onSubmit, defaultValue }) => {
                     Upload File
                   </Text>
                   <Text className="mt-2 text-sm font-medium text-gray-600">
-                    PNG and JPG files are allowed
+                    PNG, JPG and JPEG files are allowed (Max 2MB)
                   </Text>
                   <input
                     id="single-upload"
@@ -295,6 +357,9 @@ const ProductModal = ({ isOpen, onClose, onSubmit, defaultValue }) => {
                       mx="auto"
                     />
                   </Box>
+                  <Text textAlign="center" fontSize="sm" color="gray.600">
+                    {value.sketch.name ? value.sketch.name : value.sketch}
+                  </Text>
                   <Button
                     size="sm"
                     colorScheme="red"
@@ -304,9 +369,6 @@ const ProductModal = ({ isOpen, onClose, onSubmit, defaultValue }) => {
                   >
                     Remove
                   </Button>
-                  <Text textAlign="center" fontSize="sm" color="gray.600">
-                    {value.sketch.name}
-                  </Text>
                 </Box>
               )}
             </Box>
