@@ -6,11 +6,20 @@ import {
   ModalContent, ModalFooter, ModalHeader, ModalOverlay, Stack, Text 
 } from "@chakra-ui/react";
 import { MdDelete, MdFileUpload } from "react-icons/md";
+import {useDeleteGalleryImageMutation} from '../../../../services/gallery/delete-gallery-image'
+import { toast } from "react-toastify";
 
 const GalleryAddEdit = ({
   isOpen, onClose, defaultValue,
-  addSubmit, editSubmit
+  addSubmit, editSubmit, refetchShowGallery
 }) => {
+console.log(refetchShowGallery)
+  const {
+    mutate: deleteImage,
+    // isLoading: getLoadingDeleteImage,
+    // refetch: refetchShowGallery,
+  } = useDeleteGalleryImageMutation()
+
   const [value, setValue] = useState({});
 
   const handleChange = (key, data) => {
@@ -20,6 +29,7 @@ const GalleryAddEdit = ({
   const handleClose = () => {
     setValue({
       title: '',
+      description:'',
       galleryImages:[]
     })
     onClose()
@@ -38,6 +48,7 @@ const GalleryAddEdit = ({
       editSubmit({
         id: defaultValue.id,
         title: value.title,
+        description: value.description,
         galleryImages:formData
       })
     } else {
@@ -45,10 +56,32 @@ const GalleryAddEdit = ({
       value.galleryImages.forEach((img) => { formData.append('image', img); });
       addSubmit({
         title: value.title,
+        description: value.description,
         galleryImages:formData
       })
     }
   }
+
+  const handleDeleteImage = (file) => {
+    if (file?.id) {
+      deleteImage(file.id, {
+        onSuccess: () => {
+          refetchShowGallery();
+          toast.success("Delete image success!");
+        },
+        onError: (err) => {
+          toast.error("Delete image failed!");
+        },
+      });
+    }
+
+    setValue({
+      ...value,
+      galleryImages: value.galleryImages.filter(
+        (selectedFile) => selectedFile !== file
+      )
+    })
+  };
 
   useEffect(() => {
     if (!defaultValue) return;
@@ -77,6 +110,19 @@ const GalleryAddEdit = ({
                       value={value.title || ""}
                       onChange={(e) =>
                         handleChange('title', e.target.value)
+                      }
+                    />
+                  </InputGroup>
+                </FormControl>
+                <FormControl isRequired mt={4}>
+                  <FormLabel>Description</FormLabel>
+                  <InputGroup>
+                    <Input
+                      type='text'
+                      placeholder="Description"
+                      value={value.description || ""}
+                      onChange={(e) =>
+                        handleChange('description', e.target.value)
                       }
                     />
                   </InputGroup>
@@ -139,13 +185,14 @@ const GalleryAddEdit = ({
                             <Button
                               colorScheme="red"
                               size="sm"
-                              onClick={() =>
-                                setValue({
-                                 ...value,
-                                  galleryImages: value.galleryImages.filter(
-                                    (selectedFile) => selectedFile !== file
-                                  )
-                                })
+                              onClick={(e) =>
+                                handleDeleteImage(file || e.target.value)
+                                // setValue({
+                                //  ...value,
+                                //   galleryImages: value.galleryImages.filter(
+                                //     (selectedFile) => selectedFile !== file
+                                //   )
+                                // })
                               }
                               ml="auto"
                             >

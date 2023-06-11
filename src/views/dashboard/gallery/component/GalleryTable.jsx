@@ -34,6 +34,7 @@ const GalleryTable = ({ columnsData }) => {
 
   const defaultValue = {
     title: '',
+    description:'',
     galleryImages: []
   }
 
@@ -94,10 +95,12 @@ const GalleryTable = ({ columnsData }) => {
     }
   };
 
-  const AddSubmit = ({ title, galleryImages }) => {
+  const AddSubmit = ({ title, description, galleryImages }) => {
+    console.log(description)
     createTitle(
       {
-        title: title
+        title: title,
+        description: description,
       },
       {
         onSuccess: (response) => {
@@ -110,32 +113,33 @@ const GalleryTable = ({ columnsData }) => {
               onSuccess: () => {
                 onClose()
                 refetchShowGallery()
-                toast.success("Edit product success!");
+                toast.success("Create gallery success!");
                 // resolve();
               },
               onError: (err) => {
                 console.log(err)
-                toast.error("Upload Image product failed!");
+                toast.error("Upload Image gallery failed!");
                 // reject(err);
               },
             }
           );  
         },
         onError: (err) => {
-          toast.error("Create Title product failed!");
+          toast.error("Create Title gallery failed!");
         },
       }
     );
   }
 
-  const EditSubmit = ({ id, title, galleryImages }) => {
+  const EditSubmit = ({ id, title, description, galleryImages }) => {
     updateTitle(
       {
         id: id,
-        title: title
+        title: title,
+        description: description
       },
       {
-        onSuccess: (response) => {
+        onSuccess: () => {
           uploadImage(
             {
               id: id,
@@ -145,19 +149,19 @@ const GalleryTable = ({ columnsData }) => {
               onSuccess: () => {
                 onClose()
                 refetchShowGallery()
-                toast.success("Create product success!");
+                toast.success("Edit gallery success!");
                 // resolve();
               },
               onError: (err) => {
                 console.log(err)
-                toast.error("Create product failed!");
+                toast.error("Edit image gallery failed!");
                 // reject(err);
               },
             }
           );  
         },
         onError: (err) => {
-          toast.error("Create Title product failed!");
+          toast.error("Edit Title gallery failed!");
         },
       }
     );
@@ -234,6 +238,12 @@ const GalleryTable = ({ columnsData }) => {
                           {cell.value}
                         </p>
                       );
+                    } else if (cell.column.Header.toUpperCase() === "DESCRIPTION") {
+                      data = (
+                        <p className="pr-14 text-sm font-semibold text-navy-700 dark:text-white">
+                          {cell.value}
+                        </p>
+                      );
                     } else if (cell.column.Header.toUpperCase() === "EDIT") {
                       data = (
                         <div className="flex justify-center text-gray-900 dark:text-white">
@@ -281,6 +291,7 @@ const GalleryTable = ({ columnsData }) => {
         defaultValue={editGalleryData ? editGalleryData : defaultValue}
         addSubmit={AddSubmit}
         editSubmit={EditSubmit}
+        refetchShowGallery={refetchShowGallery}
       />
       <GalleryDelete
         data={deleteGalleryData}
