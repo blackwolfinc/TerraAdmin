@@ -96,6 +96,7 @@ const GalleryTable = ({ columnsData }) => {
   };
 
   const AddSubmit = ({ title, description, galleryImages }) => {
+    console.log(description)
     createTitle(
       {
         title: title,
