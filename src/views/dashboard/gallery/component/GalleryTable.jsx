@@ -281,6 +281,7 @@ const GalleryTable = ({ columnsData }) => {
         defaultValue={editGalleryData ? editGalleryData : defaultValue}
         addSubmit={AddSubmit}
         editSubmit={EditSubmit}
+        refetchShowGallery={refetchShowGallery}
       />
       <GalleryDelete
         data={deleteGalleryData}

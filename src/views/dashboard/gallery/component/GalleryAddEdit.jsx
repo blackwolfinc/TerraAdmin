@@ -6,11 +6,20 @@ import {
   ModalContent, ModalFooter, ModalHeader, ModalOverlay, Stack, Text 
 } from "@chakra-ui/react";
 import { MdDelete, MdFileUpload } from "react-icons/md";
+import {useDeleteGalleryImageMutation} from '../../../../services/gallery/delete-gallery-image'
+import { toast } from "react-toastify";
 
 const GalleryAddEdit = ({
   isOpen, onClose, defaultValue,
-  addSubmit, editSubmit
+  addSubmit, editSubmit, refetchShowGallery
 }) => {
+console.log(refetchShowGallery)
+  const {
+    mutate: deleteImage,
+    // isLoading: getLoadingDeleteImage,
+    // refetch: refetchShowGallery,
+  } = useDeleteGalleryImageMutation()
+
   const [value, setValue] = useState({});
 
   const handleChange = (key, data) => {
@@ -49,6 +58,27 @@ const GalleryAddEdit = ({
       })
     }
   }
+
+  const handleDeleteImage = (file) => {
+    if (file?.id) {
+      deleteImage(file.id, {
+        onSuccess: () => {
+          refetchShowGallery();
+          toast.success("Delete image success!");
+        },
+        onError: (err) => {
+          toast.error("Delete image failed!");
+        },
+      });
+    }
+
+    setValue({
+      ...value,
+      galleryImages: value.galleryImages.filter(
+        (selectedFile) => selectedFile !== file
+      )
+    })
+  };
 
   useEffect(() => {
     if (!defaultValue) return;
@@ -139,13 +169,14 @@ const GalleryAddEdit = ({
                             <Button
                               colorScheme="red"
                               size="sm"
-                              onClick={() =>
-                                setValue({
-                                 ...value,
-                                  galleryImages: value.galleryImages.filter(
-                                    (selectedFile) => selectedFile !== file
-                                  )
-                                })
+                              onClick={(e) =>
+                                handleDeleteImage(file || e.target.value)
+                                // setValue({
+                                //  ...value,
+                                //   galleryImages: value.galleryImages.filter(
+                                //     (selectedFile) => selectedFile !== file
+                                //   )
+                                // })
                               }
                               ml="auto"
                             >

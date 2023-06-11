@@ -133,7 +133,7 @@ const PartnerAddEdit = ({
                           >
                             <Image
                               src={
-                                typeof value?.image === "string"
+                                typeof value.image === "string"
                                   ? `${process.env.REACT_APP_API_IMAGE}/${value?.image}`
                                   : URL.createObjectURL(value?.image[0])
                               }
