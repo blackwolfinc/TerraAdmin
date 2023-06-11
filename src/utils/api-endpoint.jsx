@@ -17,6 +17,7 @@ export const API_ENDPOINT = {
   PATCH_GALLERY_TITLE: "/gallery/",
   DELETE_GALLERY: "/gallery/",
   DELETE_GALLERY_IMAGE: "/gallery/image/",
+  DELETE_GALLERY_IMAGE_ARRAY:"/gallery/images/array",
   //PARTNER
   GET_ALL_PARTNER: "/partner",
   POST_PARTNER: "/partner",

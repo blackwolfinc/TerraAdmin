@@ -6,19 +6,11 @@ import {
   ModalContent, ModalFooter, ModalHeader, ModalOverlay, Stack, Text 
 } from "@chakra-ui/react";
 import { MdDelete, MdFileUpload } from "react-icons/md";
-import {useDeleteGalleryImageMutation} from '../../../../services/gallery/delete-gallery-image'
-import { toast } from "react-toastify";
 
 const GalleryAddEdit = ({
   isOpen, onClose, defaultValue,
   addSubmit, editSubmit, refetchShowGallery
 }) => {
-console.log(refetchShowGallery)
-  const {
-    mutate: deleteImage,
-    // isLoading: getLoadingDeleteImage,
-    // refetch: refetchShowGallery,
-  } = useDeleteGalleryImageMutation()
 
   const [value, setValue] = useState({});
 
@@ -38,8 +30,16 @@ console.log(refetchShowGallery)
   const handleSubmit = (val) => {
     val.preventDefault();
     const isEdit = defaultValue.title;
+    let deleteImages = []
     
     if (isEdit) {
+      if (defaultValue.galleryImages?.length > 0) {
+        const imagesDefault = value.galleryImages.map(v => v.id)
+        deleteImages = defaultValue.galleryImages
+          .filter((item) => item.id).filter(v => !imagesDefault.includes(v.id) );
+      }
+      
+
       const newImages = value.galleryImages.filter((item) =>
         item instanceof File 
       );
@@ -49,7 +49,8 @@ console.log(refetchShowGallery)
         id: defaultValue.id,
         title: value.title,
         description: value.description,
-        galleryImages:formData
+        galleryImages: formData,
+        imagesDelete: deleteImages
       })
     } else {
       const formData = new FormData();
@@ -57,31 +58,10 @@ console.log(refetchShowGallery)
       addSubmit({
         title: value.title,
         description: value.description,
-        galleryImages:formData
+        galleryImages:formData,
       })
     }
   }
-
-  const handleDeleteImage = (file) => {
-    if (file?.id) {
-      deleteImage(file.id, {
-        onSuccess: () => {
-          refetchShowGallery();
-          toast.success("Delete image success!");
-        },
-        onError: (err) => {
-          toast.error("Delete image failed!");
-        },
-      });
-    }
-
-    setValue({
-      ...value,
-      galleryImages: value.galleryImages.filter(
-        (selectedFile) => selectedFile !== file
-      )
-    })
-  };
 
   useEffect(() => {
     if (!defaultValue) return;
@@ -186,13 +166,12 @@ console.log(refetchShowGallery)
                               colorScheme="red"
                               size="sm"
                               onClick={(e) =>
-                                handleDeleteImage(file || e.target.value)
-                                // setValue({
-                                //  ...value,
-                                //   galleryImages: value.galleryImages.filter(
-                                //     (selectedFile) => selectedFile !== file
-                                //   )
-                                // })
+                                setValue({
+                                 ...value,
+                                  galleryImages: value.galleryImages.filter(
+                                    (selectedFile) => selectedFile !== file
+                                  )
+                                })
                               }
                               ml="auto"
                             >

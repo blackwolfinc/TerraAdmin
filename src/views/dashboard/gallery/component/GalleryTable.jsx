@@ -16,6 +16,7 @@ import { useCreateGalleryTitleMutation } from "services/gallery/post-gallery-tit
 import { useCreateGalleryImageMutation } from "services/gallery/post-gallery-image";
 import { useEditGalleryTitleMutation } from "services/gallery/patch-gallery-title";
 import { useDeleteGalleryMutation } from "services/gallery/delete-product";
+import { useDeleteGalleryImageMutation } from "services/gallery/delete-gallery-image-array";
 import { toast } from "react-toastify";
 
 const GalleryTable = ({ columnsData }) => {
@@ -27,6 +28,8 @@ const GalleryTable = ({ columnsData }) => {
   const { mutate: uploadImage } = useCreateGalleryImageMutation();
   const { mutate: updateTitle } = useEditGalleryTitleMutation();
   const { mutate: deleteGallery } = useDeleteGalleryMutation();
+  const { mutate: deleteImages } = useDeleteGalleryImageMutation();
+  
 
   const columns = useMemo(() => columnsData, [columnsData]);
   const data = useMemo(() =>
@@ -96,7 +99,6 @@ const GalleryTable = ({ columnsData }) => {
   };
 
   const AddSubmit = ({ title, description, galleryImages }) => {
-    console.log(description)
     createTitle(
       {
         title: title,
@@ -131,7 +133,10 @@ const GalleryTable = ({ columnsData }) => {
     );
   }
 
-  const EditSubmit = ({ id, title, description, galleryImages }) => {
+  const EditSubmit = ({ id, title, description, galleryImages, imagesDelete }) => {
+    const isDeleteImages = imagesDelete?.length > 0;
+    const idDelete = imagesDelete?.map(value => value.id)?.join(',');
+
     updateTitle(
       {
         id: id,
@@ -140,25 +145,56 @@ const GalleryTable = ({ columnsData }) => {
       },
       {
         onSuccess: () => {
-          uploadImage(
-            {
-              id: id,
-              image: galleryImages,
-            },
-            {
+          if (isDeleteImages) {
+            deleteImages(idDelete, {
               onSuccess: () => {
-                onClose()
-                refetchShowGallery()
-                toast.success("Edit gallery success!");
-                // resolve();
+                  uploadImage(
+                    {
+                      id: id,
+                      image: galleryImages,
+                    },
+                    {
+                      onSuccess: () => {
+                        onClose()
+                        refetchShowGallery()
+                        toast.success("Edit gallery success!");
+                        // resolve();
+                      },
+                      onError: (err) => {
+                        console.log(err)
+                        toast.error("Edit image gallery failed!");
+                        // reject(err);
+                      },
+                    }
+                  ); 
+                },
+                onError: (err) => {
+                  console.log(err)
+                  toast.error(" failed!");
+                  // reject(err);
+                },
+            })
+          } else {
+            uploadImage(
+              {
+                id: id,
+                image: galleryImages,
               },
-              onError: (err) => {
-                console.log(err)
-                toast.error("Edit image gallery failed!");
-                // reject(err);
-              },
-            }
-          );  
+              {
+                onSuccess: () => {
+                  onClose()
+                  refetchShowGallery()
+                  toast.success("Edit gallery success!");
+                  // resolve();
+                },
+                onError: (err) => {
+                  console.log(err)
+                  toast.error("Edit image gallery failed!");
+                  // reject(err);
+                },
+              }
+            );  
+          }
         },
         onError: (err) => {
           toast.error("Edit Title gallery failed!");
