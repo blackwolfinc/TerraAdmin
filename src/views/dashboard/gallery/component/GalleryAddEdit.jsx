@@ -29,6 +29,7 @@ console.log(refetchShowGallery)
   const handleClose = () => {
     setValue({
       title: '',
+      description:'',
       galleryImages:[]
     })
     onClose()
@@ -47,6 +48,7 @@ console.log(refetchShowGallery)
       editSubmit({
         id: defaultValue.id,
         title: value.title,
+        description: value.description,
         galleryImages:formData
       })
     } else {
@@ -54,6 +56,7 @@ console.log(refetchShowGallery)
       value.galleryImages.forEach((img) => { formData.append('image', img); });
       addSubmit({
         title: value.title,
+        description: value.description,
         galleryImages:formData
       })
     }
@@ -107,6 +110,19 @@ console.log(refetchShowGallery)
                       value={value.title || ""}
                       onChange={(e) =>
                         handleChange('title', e.target.value)
+                      }
+                    />
+                  </InputGroup>
+                </FormControl>
+                <FormControl isRequired mt={4}>
+                  <FormLabel>Description</FormLabel>
+                  <InputGroup>
+                    <Input
+                      type='text'
+                      placeholder="Description"
+                      value={value.description || ""}
+                      onChange={(e) =>
+                        handleChange('description', e.target.value)
                       }
                     />
                   </InputGroup>

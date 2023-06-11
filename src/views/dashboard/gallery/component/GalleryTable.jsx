@@ -34,6 +34,7 @@ const GalleryTable = ({ columnsData }) => {
 
   const defaultValue = {
     title: '',
+    description:'',
     galleryImages: []
   }
 
@@ -94,10 +95,11 @@ const GalleryTable = ({ columnsData }) => {
     }
   };
 
-  const AddSubmit = ({ title, galleryImages }) => {
+  const AddSubmit = ({ title, description, galleryImages }) => {
     createTitle(
       {
-        title: title
+        title: title,
+        description: description,
       },
       {
         onSuccess: (response) => {
@@ -128,11 +130,12 @@ const GalleryTable = ({ columnsData }) => {
     );
   }
 
-  const EditSubmit = ({ id, title, galleryImages }) => {
+  const EditSubmit = ({ id, title, description, galleryImages }) => {
     updateTitle(
       {
         id: id,
-        title: title
+        title: title,
+        description: description
       },
       {
         onSuccess: () => {
@@ -229,6 +232,12 @@ const GalleryTable = ({ columnsData }) => {
                         </p>
                       );
                     } else if (cell.column.Header.toUpperCase() === "TITLE") {
+                      data = (
+                        <p className="pr-14 text-sm font-semibold text-navy-700 dark:text-white">
+                          {cell.value}
+                        </p>
+                      );
+                    } else if (cell.column.Header.toUpperCase() === "DESCRIPTION") {
                       data = (
                         <p className="pr-14 text-sm font-semibold text-navy-700 dark:text-white">
                           {cell.value}

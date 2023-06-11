@@ -9,6 +9,10 @@ const Gallery = () => {
       accessor: "title",
     },
     {
+      Header: "DESCRIPTION",
+      accessor: "description",
+    },
+    {
       Header: "IMAGE",
       accessor: "galleryImages",
     },
