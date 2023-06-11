@@ -51,14 +51,25 @@ const UserModal = (props) => {
     delete value.createdAt;
     delete value.updatedAt;
 
+    // For Email Format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    // Password minimal 8 characters
+    const passwordRegex = /^.{8,}$/;
+
     // Check Required
     if (
       (!value?.id &&
-        value?.name &&
-        value?.email &&
-        value?.password &&
-        value?.role) ||
-      (value?.id && value?.name && value?.email && value?.role)
+        value?.name.length > 0 &&
+        emailRegex.test(value?.email) &&
+        passwordRegex.test(value?.password) &&
+        value?.phone.length > 0 &&
+        value?.role.length > 0) ||
+      (value?.id &&
+        value?.name.length > 0 &&
+        emailRegex.test(value?.email) &&
+        value?.phone.length > 0 &&
+        value?.role.length > 0)
     ) {
       onSubmit(value);
       // For reset and close modal
@@ -150,7 +161,9 @@ const UserModal = (props) => {
               </InputRightElement>
             </InputGroup>
             {!value.id && isError && (
-              <FormErrorMessage>Password is required.</FormErrorMessage>
+              <FormErrorMessage>
+                Password must be at least 8 characters.
+              </FormErrorMessage>
             )}
             {value.id && (
               <FormHelperText>
