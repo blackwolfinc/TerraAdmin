@@ -153,7 +153,7 @@ const GalleryTable = ({ columnsData }) => {
               },
               onError: (err) => {
                 console.log(err)
-                toast.error("Upload gallery failed!");
+                toast.error("Edit image gallery failed!");
                 // reject(err);
               },
             }
