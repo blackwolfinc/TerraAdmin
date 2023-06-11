@@ -34,4 +34,6 @@ export const API_ENDPOINT = {
   PATCH_PROMO: "/promo",
   DELETE_PROMO: "/promo",
   POST_IMAGE_PROMO: "/promo/image/upload/",
+  //CUSTOMERS
+  GET_ALL_CUSTOMERS: "/customer/",
 };
