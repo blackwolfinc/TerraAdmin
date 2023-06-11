@@ -112,13 +112,17 @@ const Blogs = () => {
       {
         onSuccess: () => {
           toast.success("Blog berhasil diubah");
+
+          if (data.image !== modalEditValue.image) {
+            handlePostThumbnail(modalEditValue.id, data.image);
+          }
         },
         onError: (error) => {
           toast.error(error?.response?.data?.message || "Gagal mengubah blog!");
         },
         onSettled: () => {
-          setIsModalEditOpen(false);
           refetchBlog();
+          setIsModalEditOpen(false);
         },
       }
     );
