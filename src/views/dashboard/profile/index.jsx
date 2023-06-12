@@ -1,44 +1,44 @@
 import React from "react";
+import { UserContext } from "context/UserContext";
+import Card from "components/card";
+import { useUserDataQuery } from "services/user/get-user";
 import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
   FormControl,
   FormLabel,
   Input,
-  ModalCloseButton,
   Select,
   InputRightElement,
   Button,
   InputGroup,
   FormHelperText,
   FormErrorMessage,
+  Box,
 } from "@chakra-ui/react";
+import { useUpdateUserMutation } from "services/user/put-user";
+import { toast } from "react-toastify";
 
-const UserModal = (props) => {
-  const { isOpen, onClose, onSubmit, defaultValue } = props;
+const Profile = () => {
+  const { user } = React.useContext(UserContext);
+  const { data: fetchUser, refetch: refetchUser } = useUserDataQuery(user.id);
+  const { mutate: updateUser } = useUpdateUserMutation();
 
   const [isError, setIsError] = React.useState(false);
   const [showPassword, setShowPassword] = React.useState(false);
   const [value, setValue] = React.useState({});
 
   React.useEffect(() => {
-    if (!defaultValue) return;
-    setValue(defaultValue);
-  }, [defaultValue]);
+    if (!fetchUser) return;
+    setValue(fetchUser.data);
+  }, [fetchUser]);
 
   React.useEffect(() => {
     setIsError(false);
   }, [value]);
 
-  const handleCancel = () => {
-    setValue({});
+  const handleReset = () => {
+    setValue(fetchUser.data);
     setShowPassword(false);
     setIsError(false);
-    onClose();
   };
 
   const handleSubmit = (e) => {
@@ -54,23 +54,33 @@ const UserModal = (props) => {
     // Password minimal 8 characters
     const passwordRegex = /^.{8,}$/;
 
-    // Check Required
+    // // Check Required
     if (
-      (!value?.id &&
-        value?.name.length > 0 &&
-        emailRegex.test(value?.email) &&
-        passwordRegex.test(value?.password) &&
-        value?.phone.length > 0 &&
-        value?.role.length > 0) ||
-      (value?.id &&
-        value?.name.length > 0 &&
-        emailRegex.test(value?.email) &&
-        value?.phone.length > 0 &&
-        value?.role.length > 0)
+      value?.name?.length > 0 &&
+      emailRegex.test(value?.email) &&
+      passwordRegex.test(value?.password) &&
+      value?.phone?.length > 0 &&
+      value?.role?.length > 0
     ) {
-      onSubmit(value);
-      // For reset and close modal
-      handleCancel();
+      const id = value.id;
+      delete value.id;
+      delete value.role;
+      updateUser(
+        {
+          id: id,
+          body: value,
+        },
+        {
+          onSuccess: () => {
+            setShowPassword(false);
+            refetchUser();
+            toast.success("Update user success!");
+          },
+          onError: (err) => {
+            toast.error("Update user failed!");
+          },
+        }
+      );
     } else {
       setIsError(true);
     }
@@ -85,19 +95,14 @@ const UserModal = (props) => {
   };
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      size="xl"
-      motionPreset="slideInBottom"
-      closeOnOverlayClick={false}
-    >
-      <ModalOverlay />
-      <ModalContent>
-        <ModalHeader>{value?.id ? "EDIT" : "ADD"} USER</ModalHeader>
-        <ModalCloseButton onClick={handleCancel} />
-        <hr />
-        <ModalBody>
+    <div className="mt-3">
+      <Card extra={"w-full pb-10 p-4 h-full"}>
+        <header className="relative flex items-center justify-between">
+          <div className="text-xl font-bold text-navy-700 dark:text-white">
+            PROFILE SETTING
+          </div>
+        </header>
+        <div className="mt-4 overflow-x-scroll px-1 xl:overflow-x-hidden">
           <FormControl isRequired mt={4} isInvalid={isError}>
             <FormLabel>Fullname</FormLabel>
             <Input
@@ -111,7 +116,12 @@ const UserModal = (props) => {
               <FormErrorMessage>Fullname is required.</FormErrorMessage>
             )}
           </FormControl>
-          <FormControl isRequired mt={4} isInvalid={isError}>
+          <FormControl
+            isRequired
+            mt={4}
+            isInvalid={user.role === "SUPER ADMIN" && isError}
+            isDisabled={user.role === "ADMIN"}
+          >
             <FormLabel>Email</FormLabel>
             <Input
               type="email"
@@ -120,7 +130,14 @@ const UserModal = (props) => {
               value={value.email || ""}
               onChange={handleChange}
             />
-            {isError && <FormErrorMessage>Email is required.</FormErrorMessage>}
+            {user.role === "SUPER ADMIN" && isError && (
+              <FormErrorMessage>Email is required.</FormErrorMessage>
+            )}
+            {user.role === "ADMIN" && (
+              <FormHelperText>
+                Only Super Admin can change the email.
+              </FormHelperText>
+            )}
           </FormControl>
           <FormControl isRequired mt={4} isInvalid={isError}>
             <FormLabel>Phone</FormLabel>
@@ -133,11 +150,7 @@ const UserModal = (props) => {
             />
             {isError && <FormErrorMessage>Phone is required.</FormErrorMessage>}
           </FormControl>
-          <FormControl
-            isRequired={!value?.id}
-            mt={4}
-            isInvalid={!value.id && isError}
-          >
+          <FormControl isRequired mt={4} isInvalid={isError}>
             <FormLabel>Password</FormLabel>
             <InputGroup>
               <Input
@@ -157,7 +170,7 @@ const UserModal = (props) => {
                 </Button>
               </InputRightElement>
             </InputGroup>
-            {!value.id && isError && (
+            {isError && (
               <FormErrorMessage>
                 Password must be at least 8 characters.
               </FormErrorMessage>
@@ -168,7 +181,7 @@ const UserModal = (props) => {
               </FormHelperText>
             )}
           </FormControl>
-          <FormControl isRequired mt={4} isInvalid={isError}>
+          <FormControl isRequired mt={4} isDisabled>
             <FormLabel>Role</FormLabel>
             <Select
               placeholder="Select Role"
@@ -176,32 +189,34 @@ const UserModal = (props) => {
               value={value.role || setValue({ ...value, role: "ADMIN" })}
               onChange={handleChange}
             >
-              <option value="SUPER ADMIN" disabled>
-                Superadmin
-              </option>
+              <option value="SUPER ADMIN">Superadmin</option>
               <option value="ADMIN">Admin</option>
             </Select>
-            {isError && <FormErrorMessage>Role is required.</FormErrorMessage>}
+            {user.role === "ADMIN" && (
+              <FormHelperText>
+                Only Super Admin can change the role.
+              </FormHelperText>
+            )}
           </FormControl>
-        </ModalBody>
-        <ModalFooter>
-          <button
-            type="submit"
-            onClick={handleSubmit}
-            className="linear mr-3 rounded-xl bg-brand-500 px-8 py-2 text-center text-base font-medium text-white transition duration-200 hover:bg-brand-800 active:bg-brand-700"
-          >
-            SAVE
-          </button>
-          <button
-            onClick={handleCancel}
-            className="linear rounded-xl bg-gray-100 px-6 py-2 text-center text-base font-medium text-gray-800 transition duration-200 hover:bg-gray-300 active:bg-gray-400"
-          >
-            CANCEL
-          </button>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+          <Box display="flex" justifyContent="flex-end" mt={4}>
+            <button
+              type="submit"
+              onClick={handleSubmit}
+              className="linear mr-3 rounded-xl bg-brand-500 px-8 py-2 text-center text-base font-medium text-white transition duration-200 hover:bg-brand-800 active:bg-brand-700"
+            >
+              SAVE
+            </button>
+            <button
+              onClick={handleReset}
+              className="linear rounded-xl bg-gray-100 px-6 py-2 text-center text-base font-medium text-gray-800 transition duration-200 hover:bg-gray-300 active:bg-gray-400"
+            >
+              CLEAR
+            </button>
+          </Box>
+        </div>
+      </Card>
+    </div>
   );
 };
 
-export default UserModal;
+export default Profile;

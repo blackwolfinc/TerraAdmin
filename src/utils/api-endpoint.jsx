@@ -1,12 +1,15 @@
 export const API_ENDPOINT = {
   LOGIN: "/auth/login",
+  // PRODUCT
   GET_ALL_PRODUCTS: "/product/",
   CREATE_PRODUCT: "/product/",
   UPLOAD_SKETCH_PRODUCT: "/product/image/denah/upload/",
   UPLOAD_IMAGES_PRODUCT: "/product/image/slide/upload/",
   DELETE_IMAGES_PRODUCT: "/product/images/array?images=",
   DELETE_PRODUCT: "/product/",
+  // USER
   GET_ALL_USERS: "/user/",
+  GET_USER: "/user/",
   CREATE_USER: "/user/",
   UPDATE_USER: "/user/",
   DELETE_USER: "/user/",

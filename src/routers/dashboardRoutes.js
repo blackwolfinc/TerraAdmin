@@ -19,6 +19,8 @@ import {
   MdRedeem,
   MdHandshake,
 } from "react-icons/md";
+import {HiUserCircle} from 'react-icons/hi'
+import Profile from "views/dashboard/profile";
 
 const dashboardRoutes = [
   {
@@ -71,6 +73,13 @@ const dashboardRoutes = [
     path: "blog",
     icon: <MdNewspaper className="h-6 w-6" />,
     component: <Blogs />,
+  },
+  {
+    name: "Profile",
+    layout: "/dashboard",
+    path: "profile",
+    icon: <HiUserCircle className="h-6 w-6" />,
+    component: <Profile />,
   },
 ];
 export default dashboardRoutes;
