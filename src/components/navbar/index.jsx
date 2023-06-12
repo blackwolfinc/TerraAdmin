@@ -155,7 +155,7 @@ const Navbar = (props) => {
 
               <div className="ml-4 mt-3 flex flex-col">
                 <a
-                  href=" "
+                  href="/dashboard/profile"
                   className="text-sm text-gray-800 dark:text-white hover:dark:text-white"
                 >
                   Profile Settings
