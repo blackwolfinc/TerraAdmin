@@ -18,7 +18,9 @@ import {
   MdPerson,
   MdRedeem,
   MdHandshake,
+  MdGroups2,
 } from "react-icons/md";
+import Customers from "views/dashboard/customers";
 
 const dashboardRoutes = [
   {
@@ -71,6 +73,13 @@ const dashboardRoutes = [
     path: "blog",
     icon: <MdNewspaper className="h-6 w-6" />,
     component: <Blogs />,
+  },
+  {
+    name: "Customer",
+    layout: "/dashboard",
+    path: "customer",
+    icon: <MdGroups2 className="h-6 w-6" />,
+    component: <Customers />,
   },
 ];
 export default dashboardRoutes;
