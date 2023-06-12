@@ -17,6 +17,7 @@ import { useUploadSketchProductMutation } from "services/product/post-sketch-pro
 import { useUploadImagesProductMutation } from "services/product/post-images-product";
 import { useDeleteProductMutation } from "services/product/delete-product";
 import { useUpdateProductMutation } from "services/product/put-product";
+import { useDeleteImagesProductMutation } from "services/product/delete-images-product";
 import { toast } from "react-toastify";
 import NoImage from "../../../../assets/img/no-image.jpg";
 
@@ -28,6 +29,7 @@ const ProductTable = ({ columnsData }) => {
   const { mutate: uploadSketchProduct } = useUploadSketchProductMutation();
   const { mutate: uploadImagesProduct } = useUploadImagesProductMutation();
   const { mutate: deleteProduct } = useDeleteProductMutation();
+  const { mutate: deleteImagesProduct } = useDeleteImagesProductMutation();
 
   const columns = React.useMemo(() => columnsData, [columnsData]);
   const data = React.useMemo(
@@ -45,15 +47,8 @@ const ProductTable = ({ columnsData }) => {
     usePagination
   );
 
-  const {
-    getTableProps,
-    getTableBodyProps,
-    headerGroups,
-    page,
-    prepareRow,
-    initialState,
-  } = tableInstance;
-  initialState.pageSize = 5;
+  const { getTableProps, getTableBodyProps, headerGroups, page, prepareRow } =
+    tableInstance;
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [editProductData, setEditProductData] = React.useState(null);
@@ -61,7 +56,6 @@ const ProductTable = ({ columnsData }) => {
 
   React.useEffect(() => {
     if (isOpen) return;
-
     setEditProductData(null);
   }, [isOpen]);
 
@@ -71,7 +65,7 @@ const ProductTable = ({ columnsData }) => {
         uploadImagesProduct(
           {
             id: response?.data?.data?.id,
-            image: value.images,
+            image: value.productImageSlides,
           },
           {
             onSuccess: () => {
@@ -86,13 +80,12 @@ const ProductTable = ({ columnsData }) => {
         );
       });
     };
-
     const uploadSketch = (response) => {
       return new Promise((resolve, reject) => {
         uploadSketchProduct(
           {
             id: response?.data?.data?.id,
-            image: value.sketch,
+            image: value.image_denah_path,
           },
           {
             onSuccess: () => {
@@ -114,7 +107,7 @@ const ProductTable = ({ columnsData }) => {
         {
           title: value.title,
           description: value.description,
-          specification: value?.specification,
+          specification: value.specification,
           category: value.category,
           detailProduct: value.detailProduct,
         },
@@ -142,16 +135,32 @@ const ProductTable = ({ columnsData }) => {
           body: {
             title: value.title,
             description: value.description,
-            specification: value?.specification,
+            specification: value.specification,
             category: value.category,
             detailProduct: value.detailProduct,
           },
         },
         {
           onSuccess: (response) => {
+            // For Delete Images
+            if (value.deleteImages && value.deleteImages.length > 0) {
+              deleteImagesProduct(
+                value.deleteImages,
+                {
+                  onSuccess: () => {
+                    toast.success("Delete images product success!");
+                  },
+                  onError: (err) => {
+                    toast.error("Delete images product failed!");
+                  },
+                }
+              )
+            }
+            // For Upload Images & Sketch
             const promises = [];
-            if (value.sketch) promises.push(uploadSketch(response));
-            if (value.images.length > 0) promises.push(uploadImages(response));
+            if (value.image_denah_path) promises.push(uploadSketch(response));
+            if (value.productImageSlides.length > 0)
+              promises.push(uploadImages(response));
             if (promises.length > 0) {
               Promise.all(promises)
                 .then(() => {
@@ -175,17 +184,7 @@ const ProductTable = ({ columnsData }) => {
   };
 
   const handleEditProduct = (value) => {
-    const newData = {
-      id: value.id,
-      title: value.title,
-      description: value.description,
-      specification: value.specification,
-      sketch: value.image_denah_path,
-      images: value.productImageSlides,
-      category: value.category,
-      detailProduct: value.detailProduct,
-    };
-    setEditProductData(newData);
+    setEditProductData(value);
     onOpen();
   };
 
@@ -370,7 +369,6 @@ const ProductTable = ({ columnsData }) => {
         onClose={onClose}
         onSubmit={handleSubmitProduct}
         defaultValue={editProductData}
-        refetchAllProducts={refetchAllProducts}
       />
       <ProductDelete data={deleteProductData} onSubmit={handleDeleteProduct} />
     </Card>

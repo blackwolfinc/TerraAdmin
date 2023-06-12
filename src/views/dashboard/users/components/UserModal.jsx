@@ -26,9 +26,8 @@ const UserModal = (props) => {
   const [value, setValue] = React.useState({});
 
   React.useEffect(() => {
-    if (defaultValue) {
-      setValue(defaultValue);
-    }
+    if (!defaultValue) return;
+    setValue(defaultValue);
   }, [defaultValue]);
 
   React.useEffect(() => {

@@ -23,29 +23,22 @@ import {
 import { MdFileUpload, MdDelete } from "react-icons/md";
 import { GoPlus } from "react-icons/go";
 import Quill from "components/quill";
-import { useDeleteImagesProductMutation } from "services/product/delete-images-product";
-import { toast } from "react-toastify";
 
-const ProductModal = ({
-  isOpen,
-  onClose,
-  onSubmit,
-  defaultValue,
-  refetchAllProducts,
-}) => {
-  const { mutate: deleteImages } = useDeleteImagesProductMutation();
+const ProductModal = (props) => {
+  const { isOpen, onClose, onSubmit, defaultValue } = props;
 
-  const [isError, setIsError] = React.useState(false);
-  const [value, setValue] = React.useState({
+  const dataValue = {
     title: "",
     description: "",
-    specification: [""],
-    sketch: null,
-    images: [],
     category: "",
-    detailProduct: "<p></p>",
-    ...defaultValue,
-  });
+    specification: [""],
+    detailProduct: "",
+    productImageSlides: [],
+    image_denah_path: "",
+  };
+
+  const [isError, setIsError] = React.useState(false);
+  const [value, setValue] = React.useState(dataValue);
 
   React.useEffect(() => {
     if (!defaultValue) return;
@@ -57,16 +50,8 @@ const ProductModal = ({
   }, [value]);
 
   const handleCancel = () => {
+    setValue(dataValue);
     setIsError(false);
-    setValue({
-      title: "",
-      description: "",
-      specification: [""],
-      sketch: null,
-      images: [],
-      category: "",
-      detailProduct: "<p></p>",
-    });
     onClose();
   };
 
@@ -74,61 +59,54 @@ const ProductModal = ({
     e.preventDefault();
     setIsError(false);
 
-    const newSpecification = value.specification.filter((item) => item !== "");
-    const newSketch = value.sketch instanceof File ? value.sketch : null;
-    const newImages = value.images.filter((item) =>
-      item instanceof File ? item : null
-    );
+    const newSpecification =
+      value.specification.filter((item) => item !== "") || null;
 
-    // Check Required
+    // Regex for empty string or null or undefined
+    const nonEmptyRegex = /^(?!(^$|null|undefined))/;
+
+    // Check required
     if (
-      value.title.length > 0 &&
-      value.description.length > 0 &&
-      newSpecification.length > 0 &&
-      value.category.length > 0
+      !nonEmptyRegex.test(value.title) ||
+      !nonEmptyRegex.test(value.description) ||
+      !nonEmptyRegex.test(value.category) ||
+      !nonEmptyRegex.test(newSpecification) ||
+      !nonEmptyRegex.test(value.detailProduct) ||
+      !nonEmptyRegex.test(value.productImageSlides) ||
+      !nonEmptyRegex.test(value.image_denah_path)
     ) {
-      onSubmit({
-        id: value.id || null,
-        title: value.title,
-        description: value.description,
-        specification: newSpecification,
-        sketch: newSketch,
-        images: newImages,
-        category: value.category,
-        detailProduct: value.detailProduct,
-      });
-      setValue({
-        title: "",
-        description: "",
-        specification: [""],
-        sketch: null,
-        images: [],
-        category: "",
-        detailProduct: "<p></p>",
-      });
-      onClose();
-    } else {
       setIsError(true);
+      return;
     }
+
+    onSubmit({
+      id: value.id || null,
+      title: value.title,
+      description: value.description,
+      category: value.category,
+      specification: newSpecification,
+      detailProduct: value.detailProduct,
+      productImageSlides:
+        value?.productImageSlides?.filter((item) => item instanceof File) ||
+        null,
+      image_denah_path:
+        value?.image_denah_path instanceof File ? value.image_denah_path : null,
+      deleteImages:
+        value?.deleteImages
+          ?.filter((item) => item.id !== undefined)
+          .map((item) => item.id)
+          .join(",") || null,
+    });
+
+    handleCancel();
   };
 
-  const handleDeleteImage = (file) => {
-    if (file?.id) {
-      deleteImages(file.id, {
-        onSuccess: () => {
-          refetchAllProducts();
-          toast.success("Delete image success!");
-        },
-        onError: (err) => {
-          toast.error("Delete image failed!");
-        },
-      });
-    }
-
-    setValue({
-      ...value,
-      images: value.images.filter((selectedFile) => selectedFile !== file),
-    });
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setValue((prevValue) => ({
+      ...prevValue,
+      [name]: value,
+    }));
   };
 
   return (
@@ -150,8 +128,9 @@ const ProductModal = ({
             <Input
               type="text"
               placeholder="Title"
-              value={value.title}
-              onChange={(e) => setValue({ ...value, title: e.target.value })}
+              name="title"
+              value={value.title || ""}
+              onChange={handleChange}
             />
             {isError && <FormErrorMessage>Title is required.</FormErrorMessage>}
           </FormControl>
@@ -159,10 +138,9 @@ const ProductModal = ({
             <FormLabel>Description</FormLabel>
             <Textarea
               placeholder="Description"
-              value={value.description}
-              onChange={(e) =>
-                setValue({ ...value, description: e.target.value })
-              }
+              name="description"
+              value={value.description || ""}
+              onChange={handleChange}
             />
             {isError && (
               <FormErrorMessage>Description is required.</FormErrorMessage>
@@ -170,7 +148,7 @@ const ProductModal = ({
           </FormControl>
           <FormControl isRequired mt={4} isInvalid={isError}>
             <FormLabel>Specification</FormLabel>
-            {value.specification.map((textInput, index) => (
+            {value?.specification?.map((textInput, index) => (
               <Flex key={index} mt={2}>
                 <Input
                   type="text"
@@ -187,7 +165,7 @@ const ProductModal = ({
                     })
                   }
                 />
-                {index === value.specification.length - 1 ? (
+                {index === value?.specification?.length - 1 ? (
                   <Button
                     color="black"
                     ml="2"
@@ -227,9 +205,9 @@ const ProductModal = ({
             <FormLabel>Category</FormLabel>
             <Select
               placeholder="Select Category"
-              name="role"
-              value={value.category}
-              onChange={(e) => setValue({ ...value, category: e.target.value })}
+              name="category"
+              value={value.category || ""}
+              onChange={handleChange}
             >
               <option value="BIG_SALE">Big Sale</option>
               <option value="SUPER_DEAL">Super Deal</option>
@@ -239,17 +217,24 @@ const ProductModal = ({
               <FormErrorMessage>Category is required.</FormErrorMessage>
             )}
           </FormControl>
-          <FormControl mt={4}>
+          <FormControl isRequired mt={4} isInvalid={isError}>
             <FormLabel>Detail Product</FormLabel>
-            <Quill
-              value={value.detailProduct}
-              onChange={(e) => setValue({ ...value, detailProduct: e })}
-            />
+            <Box borderWidth={isError ? "2px" : "0px"} borderColor="red">
+              <Quill
+                value={value.detailProduct || ""}
+                onChange={(e) => setValue({ ...value, detailProduct: e })}
+              />
+            </Box>
+            {isError && (
+              <FormErrorMessage>Detail Product is required.</FormErrorMessage>
+            )}
           </FormControl>
-          <FormControl mt={4}>
+          <FormControl isRequired mt={4} isInvalid={isError}>
             <FormLabel>Images</FormLabel>
             <Box
               className="col-span-5 h-full w-full rounded-xl bg-lightPrimary dark:!bg-navy-700 2xl:col-span-6"
+              borderWidth={isError ? "2px" : "0px"}
+              borderColor="red"
               p={4}
             >
               <label
@@ -270,7 +255,10 @@ const ProductModal = ({
                   onChange={(e) =>
                     setValue({
                       ...value,
-                      images: [...value.images, ...Array.from(e.target.files)],
+                      productImageSlides: [
+                        ...value.productImageSlides,
+                        ...Array.from(e.target.files),
+                      ],
                     })
                   }
                   multiple
@@ -278,7 +266,7 @@ const ProductModal = ({
                 />
               </label>
               <Stack mt={4} spacing={2}>
-                {value.images.map((file, index) => (
+                {value?.productImageSlides?.map((file, index) => (
                   <Box
                     key={file.name || index}
                     borderWidth="2px"
@@ -304,7 +292,26 @@ const ProductModal = ({
                     <Button
                       colorScheme="red"
                       size="sm"
-                      onClick={() => handleDeleteImage(file)}
+                      // onClick={() =>
+                      //   setValue({
+                      //     ...value,
+                      //     productImageSlides: value.productImageSlides.filter(
+                      //       (selectedFile) => selectedFile !== file
+                      //     ),
+                      //   })
+                      // }
+                      onClick={() =>
+                        setValue((prevValue) => ({
+                          ...prevValue,
+                          productImageSlides:
+                            prevValue.productImageSlides.filter(
+                              (selectedFile) => selectedFile !== file
+                            ),
+                          deleteImages: prevValue.deleteImages
+                            ? [...prevValue.deleteImages, file]
+                            : [file],
+                        }))
+                      }
                       ml="auto"
                     >
                       <MdDelete />
@@ -313,14 +320,19 @@ const ProductModal = ({
                 ))}
               </Stack>
             </Box>
+            {isError && (
+              <FormErrorMessage>Product Images is required.</FormErrorMessage>
+            )}
           </FormControl>
-          <FormControl mt={4}>
+          <FormControl isRequired mt={4} isInvalid={isError}>
             <FormLabel>Sketch</FormLabel>
             <Box
               className="col-span-5 h-full w-full rounded-xl bg-lightPrimary dark:!bg-navy-700 2xl:col-span-6"
+              borderWidth={isError ? "2px" : "0px"}
+              borderColor="red"
               p={4}
             >
-              {!value.sketch ? (
+              {!value.image_denah_path ? (
                 <label
                   htmlFor="single-upload"
                   className="flex h-full w-full flex-col items-center justify-center rounded-xl border-[2px] border-dashed border-gray-200 py-3 dark:!border-navy-700 lg:pb-0"
@@ -337,7 +349,10 @@ const ProductModal = ({
                     type="file"
                     accept="image/*"
                     onChange={(e) =>
-                      setValue({ ...value, sketch: e.target.files[0] })
+                      setValue({
+                        ...value,
+                        image_denah_path: e.target.files[0],
+                      })
                     }
                     className="hidden"
                   />
@@ -347,9 +362,9 @@ const ProductModal = ({
                   <Box mb={2} textAlign="center">
                     <Image
                       src={
-                        value.sketch instanceof File
-                          ? URL.createObjectURL(value.sketch)
-                          : `${process.env.REACT_APP_API_IMAGE}/${value.sketch}`
+                        value.image_denah_path instanceof File
+                          ? URL.createObjectURL(value.image_denah_path)
+                          : `${process.env.REACT_APP_API_IMAGE}/${value.image_denah_path}`
                       }
                       alt="Preview"
                       maxH="200px"
@@ -358,13 +373,17 @@ const ProductModal = ({
                     />
                   </Box>
                   <Text textAlign="center" fontSize="sm" color="gray.600">
-                    {value.sketch.name ? value.sketch.name : value.sketch}
+                    {value.image_denah_path.name
+                      ? value.image_denah_path.name
+                      : value.image_denah_path}
                   </Text>
                   <Button
                     size="sm"
                     colorScheme="red"
                     leftIcon={<MdDelete />}
-                    onClick={() => setValue({ ...value, sketch: null })}
+                    onClick={() =>
+                      setValue({ ...value, image_denah_path: null })
+                    }
                     mb={2}
                   >
                     Remove
@@ -372,6 +391,9 @@ const ProductModal = ({
                 </Box>
               )}
             </Box>
+            {isError && (
+              <FormErrorMessage>Product Images is required.</FormErrorMessage>
+            )}
           </FormControl>
         </ModalBody>
         <ModalFooter>
