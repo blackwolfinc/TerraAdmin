@@ -39,15 +39,8 @@ const UserTable = ({ columnsData, authUser }) => {
     usePagination
   );
 
-  const {
-    getTableProps,
-    getTableBodyProps,
-    headerGroups,
-    page,
-    prepareRow,
-    initialState,
-  } = tableInstance;
-  initialState.pageSize = 5;
+  const { getTableProps, getTableBodyProps, headerGroups, page, prepareRow } =
+    tableInstance;
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [editUserData, setEditUserData] = React.useState(null);
@@ -104,10 +97,10 @@ const UserTable = ({ columnsData, authUser }) => {
         deleteUser(value, {
           onSuccess: () => {
             refetchAllUsers();
-            toast.success("Delete product success!");
+            toast.success("Delete user success!");
           },
           onError: (err) => {
-            toast.error("Delete product failed!");
+            toast.error("Delete user failed!");
           },
         });
         setDeleteUserData(null);
@@ -202,25 +195,47 @@ const UserTable = ({ columnsData, authUser }) => {
                     } else if (cell.column.Header === "EDIT") {
                       data = (
                         <div className="flex justify-center text-gray-900 dark:text-white">
-                          <Button
-                            colorScheme="purple"
-                            size="sm"
-                            onClick={() => handleEditUser(cell.row.original)}
-                          >
-                            <MdModeEditOutline />
-                          </Button>
+                          {cell.row.original.role === "ADMIN" ? (
+                            <Button
+                              colorScheme="purple"
+                              size="sm"
+                              onClick={() => handleEditUser(cell.row.original)}
+                            >
+                              <MdModeEditOutline />
+                            </Button>
+                          ) : (
+                            <Button
+                              colorScheme="blackAlpha"
+                              size="sm"
+                              isDisabled
+                            >
+                              <MdModeEditOutline />
+                            </Button>
+                          )}
                         </div>
                       );
                     } else if (cell.column.Header === "DELETE") {
                       data = (
                         <div className="flex justify-center text-red-500 dark:text-white">
-                          <Button
-                            colorScheme="red"
-                            size="sm"
-                            onClick={() => handleDeleteUser(cell.row.original)}
-                          >
-                            <HiTrash />
-                          </Button>
+                          {cell.row.original.role === "ADMIN" ? (
+                            <Button
+                              colorScheme="red"
+                              size="sm"
+                              onClick={() =>
+                                handleDeleteUser(cell.row.original)
+                              }
+                            >
+                              <HiTrash />
+                            </Button>
+                          ) : (
+                            <Button
+                              colorScheme="blackAlpha"
+                              size="sm"
+                              isDisabled
+                            >
+                              <HiTrash />
+                            </Button>
+                          )}
                         </div>
                       );
                     }
