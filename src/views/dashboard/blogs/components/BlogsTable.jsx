@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { Button } from "@chakra-ui/react";
 import { MdModeEditOutline } from "react-icons/md";
-import { HiTrash, HiEye } from "react-icons/hi";
+import { HiTrash, HiEye, HiOutlineExternalLink } from "react-icons/hi";
 import NoImage from "assets/img/no-image.jpg";
 
 import {
@@ -15,6 +15,7 @@ const columnsData = [
   {
     Header: "THUMBNAIL",
     accessor: "image",
+    disableSortBy: true,
   },
   {
     Header: "TITLE",
@@ -25,8 +26,13 @@ const columnsData = [
     accessor: "createdBy",
   },
   {
-    Header: "LIHAT",
-    accessor: "progress",
+    Header: "PREVIEW",
+    accessor: "preview",
+    disableSortBy: true,
+  },
+  {
+    Header: "LINK",
+    accessor: "slug",
     disableSortBy: true,
   },
   {
@@ -85,7 +91,8 @@ const BlogsTable = ({ tableData, onEdit, onDelete }) => {
                   {...column.getHeaderProps(column.getSortByToggleProps())}
                   key={index}
                   className={`border-b border-gray-200 pb-[10px] text-center dark:!border-navy-700 ${
-                    column.Header === "LIHAT" ||
+                    column.Header === "PREVIEW" ||
+                    column.Header === "LINK" ||
                     column.Header === "EDIT" ||
                     column.Header === "DELETE"
                       ? "w-20 px-6"
@@ -98,7 +105,8 @@ const BlogsTable = ({ tableData, onEdit, onDelete }) => {
                 >
                   <div
                     className={`${
-                      column.Header === "LIHAT" ||
+                      column.Header === "PREVIEW" ||
+                      column.Header === "LINK" ||
                       column.Header === "EDIT" ||
                       column.Header === "DELETE"
                         ? "justify-center"
@@ -150,20 +158,30 @@ const BlogsTable = ({ tableData, onEdit, onDelete }) => {
                         {cell.value || "-"}
                       </p>
                     );
-                  } else if (cell.column.Header === "LIHAT") {
+                  } else if (cell.column.Header === "PREVIEW") {
                     data = (
                       <div className="flex justify-center text-gray-700 dark:text-white">
                         <Button
-                          onClick={() =>
-                            window.open(
-                              `/product/${cell.row.original.id}`,
-                              "_blank"
-                            )
-                          }
+                          onClick={() => console.log(`Lihat detail product!`)}
                           colorScheme="gray"
                           size="sm"
                         >
                           <HiEye />
+                        </Button>
+                      </div>
+                    );
+                  } else if (cell.column.Header === "LINK") {
+                    data = (
+                      <div className="flex justify-center text-gray-700 dark:text-white">
+                        <Button
+                          onClick={() =>
+                            window.open(`/blogs/${cell.value}`, "_blank")
+                          }
+                          colorScheme="gray"
+                          size="sm"
+                          disabled={!cell.value}
+                        >
+                          <HiOutlineExternalLink />
                         </Button>
                       </div>
                     );

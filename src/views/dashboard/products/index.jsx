@@ -16,7 +16,7 @@ const Products = () => {
       accessor: "category",
     },
     {
-      Header: "DETAIL",
+      Header: "LINK",
       accessor: "",
     },
     {

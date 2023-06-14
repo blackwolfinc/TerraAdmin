@@ -2,15 +2,14 @@ import React from "react";
 import Dropdown from "components/dropdown";
 import { FiAlignJustify } from "react-icons/fi";
 import { Link } from "react-router-dom";
-import { BsArrowBarUp } from "react-icons/bs";
 import { FiSearch } from "react-icons/fi";
-// import { RiMoonFill, RiSunFill } from "react-icons/ri";
-import { IoMdNotificationsOutline } from "react-icons/io";
 import { CookieStorage, CookieKeys } from "utils/cookies";
 import { UserContext } from "context/UserContext";
+import { useNavigate } from "react-router-dom";
 
 const Navbar = (props) => {
   const { onOpenSidenav, brandText } = props;
+  const navigate = useNavigate();
   // const [darkmode, setDarkmode] = React.useState(false);
 
   const { user } = React.useContext(UserContext);
@@ -66,7 +65,7 @@ const Navbar = (props) => {
           <FiAlignJustify className="h-5 w-5" />
         </span>
         {/* start Notification */}
-        <Dropdown
+        {/* <Dropdown
           button={
             <p className="cursor-pointer">
               <IoMdNotificationsOutline className="h-4 w-4 text-gray-600 dark:text-white" />
@@ -114,7 +113,7 @@ const Navbar = (props) => {
             </div>
           }
           classNames={"py-2 top-4 -left-[230px] md:-left-[440px] w-max"}
-        />
+        /> */}
         {/* <div
           className="cursor-pointer text-gray-600"
           onClick={() => {
@@ -154,12 +153,12 @@ const Navbar = (props) => {
               <div className="mt-3 h-px w-full bg-gray-200 dark:bg-white/20 " />
 
               <div className="ml-4 mt-3 flex flex-col">
-                <a
-                  href="/dashboard/profile"
-                  className="text-sm text-gray-800 dark:text-white hover:dark:text-white"
+                <div
+                  className="cursor-pointer text-sm text-gray-800 dark:text-white hover:dark:text-white"
+                  onClick={() => navigate("/dashboard/profile")}
                 >
                   Profile Settings
-                </a>
+                </div>
                 <div
                   className="mt-3 cursor-pointer text-sm font-medium text-red-500 hover:text-red-500"
                   onClick={handleLogout}

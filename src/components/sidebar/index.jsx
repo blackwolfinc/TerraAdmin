@@ -2,6 +2,7 @@
 
 import { HiX } from "react-icons/hi";
 import Links from "./components/Links";
+import Logo from "assets/img/logo.png";
 
 const Sidebar = ({ open, onClose, routes = [] }) => {
   return (
@@ -17,12 +18,12 @@ const Sidebar = ({ open, onClose, routes = [] }) => {
         <HiX />
       </span>
 
-      <div className={`mx-[56px] mt-[50px] flex items-center`}>
-        <div className="ml-1 mt-1 h-2.5 font-poppins text-[26px] font-bold uppercase text-navy-700 dark:text-white">
-          TERRA KOTA
+      <div className={`mx-[56px] mt-[50px] flex w-40 items-center`}>
+        <div className="w-full">
+          <img src={Logo} alt="Terra Logo" className="min-h-full min-w-full" />
         </div>
       </div>
-      <div className="daark:bg-white/30 mb-7 mt-[58px] h-px bg-gray-300" />
+      <div className="my-7 h-px bg-gray-300 dark:bg-white/30" />
       {/* Nav item */}
 
       <ul className="mb-auto pt-1">

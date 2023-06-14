@@ -20,26 +20,25 @@ import { useDeleteGalleryImageMutation } from "services/gallery/delete-gallery-i
 import { toast } from "react-toastify";
 
 const GalleryTable = ({ columnsData }) => {
-  const {
-    data: galleryData,
-    refetch: refetchShowGallery,
-  } = useGalleryDataQuery();
+  const { data: galleryData, refetch: refetchShowGallery } =
+    useGalleryDataQuery();
   const { mutate: createTitle } = useCreateGalleryTitleMutation();
   const { mutate: uploadImage } = useCreateGalleryImageMutation();
   const { mutate: updateTitle } = useEditGalleryTitleMutation();
   const { mutate: deleteGallery } = useDeleteGalleryMutation();
   const { mutate: deleteImages } = useDeleteGalleryImageMutation();
-  
 
   const columns = useMemo(() => columnsData, [columnsData]);
-  const data = useMemo(() =>
-    galleryData?.data?.data?.datas || [], [galleryData?.data?.data?.datas]);
+  const data = useMemo(
+    () => galleryData?.data?.data?.datas || [],
+    [galleryData?.data?.data?.datas]
+  );
 
   const defaultValue = {
-    title: '',
-    description:'',
-    galleryImages: []
-  }
+    title: "",
+    description: "",
+    galleryImages: [],
+  };
 
   const tableInstance = useTable(
     {
@@ -113,67 +112,73 @@ const GalleryTable = ({ columnsData }) => {
             },
             {
               onSuccess: () => {
-                onClose()
-                refetchShowGallery()
+                onClose();
+                refetchShowGallery();
                 toast.success("Create gallery success!");
                 // resolve();
               },
               onError: (err) => {
-                console.log(err)
+                console.log(err);
                 toast.error("Upload Image gallery failed!");
                 // reject(err);
               },
             }
-          );  
+          );
         },
         onError: (err) => {
           toast.error("Create Title gallery failed!");
         },
       }
     );
-  }
+  };
 
-  const EditSubmit = ({ id, title, description, galleryImages, imagesDelete }) => {
+  const EditSubmit = ({
+    id,
+    title,
+    description,
+    galleryImages,
+    imagesDelete,
+  }) => {
     const isDeleteImages = imagesDelete?.length > 0;
-    const idDelete = imagesDelete?.map(value => value.id)?.join(',');
+    const idDelete = imagesDelete?.map((value) => value.id)?.join(",");
 
     updateTitle(
       {
         id: id,
         title: title,
-        description: description
+        description: description,
       },
       {
         onSuccess: () => {
           if (isDeleteImages) {
             deleteImages(idDelete, {
               onSuccess: () => {
-                  uploadImage(
-                    {
-                      id: id,
-                      image: galleryImages,
+                uploadImage(
+                  {
+                    id: id,
+                    image: galleryImages,
+                  },
+                  {
+                    onSuccess: () => {
+                      onClose();
+                      refetchShowGallery();
+                      toast.success("Edit gallery success!");
+                      // resolve();
                     },
-                    {
-                      onSuccess: () => {
-                        onClose()
-                        refetchShowGallery()
-                        toast.success("Edit gallery success!");
-                        // resolve();
-                      },
-                      onError: (err) => {
-                        console.log(err)
-                        toast.error("Edit image gallery failed!");
-                        // reject(err);
-                      },
-                    }
-                  ); 
-                },
-                onError: (err) => {
-                  console.log(err)
-                  toast.error(" failed!");
-                  // reject(err);
-                },
-            })
+                    onError: (err) => {
+                      console.log(err);
+                      toast.error("Edit image gallery failed!");
+                      // reject(err);
+                    },
+                  }
+                );
+              },
+              onError: (err) => {
+                console.log(err);
+                toast.error(" failed!");
+                // reject(err);
+              },
+            });
           } else {
             uploadImage(
               {
@@ -182,18 +187,18 @@ const GalleryTable = ({ columnsData }) => {
               },
               {
                 onSuccess: () => {
-                  onClose()
-                  refetchShowGallery()
+                  onClose();
+                  refetchShowGallery();
                   toast.success("Edit gallery success!");
                   // resolve();
                 },
                 onError: (err) => {
-                  console.log(err)
+                  console.log(err);
                   toast.error("Edit image gallery failed!");
                   // reject(err);
                 },
               }
-            );  
+            );
           }
         },
         onError: (err) => {
@@ -201,13 +206,13 @@ const GalleryTable = ({ columnsData }) => {
         },
       }
     );
-  }
+  };
 
   return (
     <Card extra={"w-full pb-10 p-4 h-full"}>
       <header className="relative flex items-center justify-between">
-        <div className="text-xl font-bold text-navy-700 dark:text-white uppercase">
-          gallery list
+        <div className="text-xl font-bold uppercase text-navy-700 dark:text-white">
+          List Gallery
         </div>
         <button
           onClick={onOpen}
@@ -226,16 +231,18 @@ const GalleryTable = ({ columnsData }) => {
                   <th
                     {...column.getHeaderProps(column.getSortByToggleProps())}
                     key={index}
-                    className={`${column.Header === "EDIT" || column.Header === "DELETE"
-                      ? "w-[80px]"
-                      : "pr-14"
-                      } border-b border-gray-200 pb-[10px] text-start dark:!border-navy-700`}
+                    className={`${
+                      column.Header === "EDIT" || column.Header === "DELETE"
+                        ? "w-[80px]"
+                        : "pr-14"
+                    } border-b border-gray-200 pb-[10px] text-start dark:!border-navy-700`}
                   >
                     <div
-                      className={`${column.Header === "EDIT" || column.Header === "DELETE"
-                        ? "justify-center"
-                        : "justify-between"
-                        } flex w-full text-xs tracking-wide text-gray-600`}
+                      className={`${
+                        column.Header === "EDIT" || column.Header === "DELETE"
+                          ? "justify-center"
+                          : "justify-between"
+                      } flex w-full text-xs tracking-wide text-gray-600`}
                     >
                       {column.render("Header")}
                     </div>
@@ -254,7 +261,7 @@ const GalleryTable = ({ columnsData }) => {
                     let data;
                     if (cell.column.Header.toUpperCase() === "IMAGE") {
                       data = (
-                        <p className="pr-14 text-sm font-bold text-navy-700 dark:text-white flex flex-row gap-5">
+                        <p className="flex flex-row gap-5 pr-14 text-sm font-bold text-navy-700 dark:text-white">
                           {cell.value?.slice(0, 5).map((value, i) => {
                             return (
                               <Image
@@ -264,7 +271,7 @@ const GalleryTable = ({ columnsData }) => {
                                 src={`${process.env.REACT_APP_API_IMAGE}/${value.image_path}`}
                                 alt={`image-${index}-${i}`}
                               />
-                            )
+                            );
                           })}
                         </p>
                       );
@@ -274,7 +281,9 @@ const GalleryTable = ({ columnsData }) => {
                           {cell.value}
                         </p>
                       );
-                    } else if (cell.column.Header.toUpperCase() === "DESCRIPTION") {
+                    } else if (
+                      cell.column.Header.toUpperCase() === "DESCRIPTION"
+                    ) {
                       data = (
                         <p className="pr-14 text-sm font-semibold text-navy-700 dark:text-white">
                           {cell.value}
@@ -298,7 +307,9 @@ const GalleryTable = ({ columnsData }) => {
                           <Button
                             colorScheme="red"
                             size="sm"
-                            onClick={() => handleDeleteGallery(cell.row.original)}
+                            onClick={() =>
+                              handleDeleteGallery(cell.row.original)
+                            }
                           >
                             <HiTrash />
                           </Button>
@@ -329,10 +340,7 @@ const GalleryTable = ({ columnsData }) => {
         editSubmit={EditSubmit}
         refetchShowGallery={refetchShowGallery}
       />
-      <GalleryDelete
-        data={deleteGalleryData}
-        onSubmit={handleDeleteGallery}
-      />
+      <GalleryDelete data={deleteGalleryData} onSubmit={handleDeleteGallery} />
     </Card>
   );
 };

@@ -8,10 +8,10 @@ import {
 import Card from "components/card";
 import { Button, Image, useDisclosure } from "@chakra-ui/react";
 import { MdModeEditOutline } from "react-icons/md";
-import { HiTrash } from "react-icons/hi";
+import { HiTrash, HiOutlineExternalLink } from "react-icons/hi";
 import PartnerAddEdit from "./PartnerAddEdit";
 import PartnerDelete from "./PartnerDelete";
-import { usePartnerDataQuery } from '../../../../services/partner/get-all-partner'
+import { usePartnerDataQuery } from "../../../../services/partner/get-all-partner";
 import { useCreatePartnerMutation } from "../../../../services/partner/post-partner";
 import { useCreatePartnerImageMutation } from "../../../../services/partner/post-partner-image";
 import { useDeletePartnerMutation } from "../../../../services/partner/delete-partner";
@@ -21,20 +21,19 @@ import { toast } from "react-toastify";
 const PartnerTable = (props) => {
   const { columnsData } = props;
 
-   const {
-    data: partnerData,
-    refetch: refetchShowPartner,
-  } = usePartnerDataQuery();
+  const { data: partnerData, refetch: refetchShowPartner } =
+    usePartnerDataQuery();
 
   const { mutate: createTitle } = useCreatePartnerMutation();
   const { mutate: uploadImage } = useCreatePartnerImageMutation();
   const { mutate: updateTitle } = useEditPartnerMutation();
   const { mutate: deletePartner } = useDeletePartnerMutation();
 
-
   const columns = useMemo(() => columnsData, [columnsData]);
-  const data = useMemo(() => 
-     partnerData?.data?.data?.datas || [], [partnerData?.data?.data?.datas]);
+  const data = useMemo(
+    () => partnerData?.data?.data?.datas || [],
+    [partnerData?.data?.data?.datas]
+  );
 
   const defaultValue = {
     title: "",
@@ -78,7 +77,7 @@ const PartnerTable = (props) => {
     onOpen();
   };
 
- const handleDeletePartner = (value) => {
+  const handleDeletePartner = (value) => {
     if (value) {
       if (typeof value === "object") {
         setDeletePartnerData(value);
@@ -103,7 +102,7 @@ const PartnerTable = (props) => {
     createTitle(
       {
         title: title,
-        link: link
+        link: link,
       },
       {
         onSuccess: (response) => {
@@ -114,39 +113,39 @@ const PartnerTable = (props) => {
             },
             {
               onSuccess: () => {
-                onClose()
-                refetchShowPartner()
+                onClose();
+                refetchShowPartner();
                 toast.success("Edit partner success!");
                 // resolve();
               },
               onError: (err) => {
-                console.log(err)
+                console.log(err);
                 toast.error("Upload Image partner failed!");
                 // reject(err);
               },
             }
-          );  
+          );
         },
         onError: (err) => {
           toast.error("Create partner failed!");
         },
       }
     );
-  }
+  };
 
   const EditSubmit = ({ id, title, link, image }) => {
-    const isUploadImage = typeof image === 'string'
+    const isUploadImage = typeof image === "string";
     updateTitle(
       {
         id: id,
         title: title,
-        link:link
+        link: link,
       },
       {
         onSuccess: () => {
           if (!isUploadImage) {
-          const formData = new FormData();
-          formData.append('image', image[0])
+            const formData = new FormData();
+            formData.append("image", image[0]);
             uploadImage(
               {
                 id: id,
@@ -154,21 +153,21 @@ const PartnerTable = (props) => {
               },
               {
                 onSuccess: () => {
-                  onClose()
-                  refetchShowPartner()
+                  onClose();
+                  refetchShowPartner();
                   toast.success("Create partner success!");
                   // resolve();
                 },
                 onError: (err) => {
-                  console.log(err)
+                  console.log(err);
                   toast.error("Create partner failed!");
                   // reject(err);
                 },
               }
-            );  
+            );
           } else {
-            onClose()
-            refetchShowPartner()
+            onClose();
+            refetchShowPartner();
             toast.success("Create partner success!");
           }
         },
@@ -177,7 +176,7 @@ const PartnerTable = (props) => {
         },
       }
     );
-  }
+  };
 
   useEffect(() => {
     if (isOpen) return;
@@ -189,7 +188,7 @@ const PartnerTable = (props) => {
     <Card extra={"w-full pb-10 p-4 h-full"}>
       <header className="relative flex items-center justify-between">
         <div className="text-xl font-bold uppercase text-navy-700 dark:text-white">
-          partner list
+          List Partner
         </div>
         <button
           onClick={onOpen}
@@ -209,14 +208,18 @@ const PartnerTable = (props) => {
                     {...column.getHeaderProps(column.getSortByToggleProps())}
                     key={index}
                     className={`${
-                      column.Header === "EDIT" || column.Header === "DELETE"
+                      column.Header === "EDIT" ||
+                      column.Header === "LINK" ||
+                      column.Header === "DELETE"
                         ? "w-[80px]"
                         : "pr-14"
                     } border-b border-gray-200 pb-[10px] text-start dark:!border-navy-700`}
                   >
                     <div
                       className={`${
-                        column.Header === "EDIT" || column.Header === "DELETE"
+                        column.Header === "EDIT" ||
+                        column.Header === "LINK" ||
+                        column.Header === "DELETE"
                           ? "justify-center"
                           : "justify-between"
                       } flex w-full text-xs tracking-wide text-gray-600`}
@@ -255,11 +258,15 @@ const PartnerTable = (props) => {
                       );
                     } else if (cell.column.Header.toUpperCase() === "LINK") {
                       data = (
-                        <p className="pr-14 text-sm font-semibold text-blue-700 hover:underline dark:text-white">
-                          <a href={cell.value} target="_blank" rel="noreferrer">
-                            Link to {cell.row.cells[1].value}
-                          </a>
-                        </p>
+                        <div className="flex justify-center text-gray-700 dark:text-white">
+                          <Button
+                            colorScheme="gray"
+                            size="sm"
+                            onClick={() => handleEditPartner(cell.row.original)}
+                          >
+                            <HiOutlineExternalLink />
+                          </Button>
+                        </div>
                       );
                     } else if (cell.column.Header.toUpperCase() === "EDIT") {
                       data = (
@@ -311,10 +318,7 @@ const PartnerTable = (props) => {
         addSubmit={AddSubmit}
         editSubmit={EditSubmit}
       />
-      <PartnerDelete
-        data={deletePartnerData}
-        onSubmit={handleDeletePartner}
-      />
+      <PartnerDelete data={deletePartnerData} onSubmit={handleDeletePartner} />
     </Card>
   );
 };

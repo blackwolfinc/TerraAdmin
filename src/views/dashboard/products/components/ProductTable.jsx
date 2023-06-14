@@ -8,7 +8,7 @@ import {
 import { Button, Image, Tag, TagLabel, useDisclosure } from "@chakra-ui/react";
 import Card from "components/card";
 import { MdModeEditOutline } from "react-icons/md";
-import { HiTrash, HiEye } from "react-icons/hi";
+import { HiTrash, HiOutlineExternalLink } from "react-icons/hi";
 import ProductModal from "./ProductModal";
 import ProductDelete from "./ProductDelete";
 import { useProductsDataQuery } from "services/product/get-all-products";
@@ -144,17 +144,14 @@ const ProductTable = ({ columnsData }) => {
           onSuccess: (response) => {
             // For Delete Images
             if (value.deleteImages && value.deleteImages.length > 0) {
-              deleteImagesProduct(
-                value.deleteImages,
-                {
-                  onSuccess: () => {
-                    toast.success("Delete images product success!");
-                  },
-                  onError: (err) => {
-                    toast.error("Delete images product failed!");
-                  },
-                }
-              )
+              deleteImagesProduct(value.deleteImages, {
+                onSuccess: () => {
+                  toast.success("Delete images product success!");
+                },
+                onError: (err) => {
+                  toast.error("Delete images product failed!");
+                },
+              });
             }
             // For Upload Images & Sketch
             const promises = [];
@@ -234,7 +231,7 @@ const ProductTable = ({ columnsData }) => {
                     key={index}
                     className={`${
                       (column.Header === "CATEGORY" && "w-[200px]") ||
-                      (column.Header === "DETAIL" && "w-[80px]") ||
+                      (column.Header === "LINK" && "w-[80px]") ||
                       (column.Header === "EDIT" && "w-[80px]") ||
                       (column.Header === "DELETE" && "w-[80px]") ||
                       "pr-14"
@@ -244,7 +241,7 @@ const ProductTable = ({ columnsData }) => {
                   >
                     <div
                       className={`${
-                        column.Header === "DETAIL" ||
+                        column.Header === "LINK" ||
                         column.Header === "EDIT" ||
                         column.Header === "DELETE"
                           ? "justify-center"
@@ -304,7 +301,7 @@ const ProductTable = ({ columnsData }) => {
                           </Tag>
                         </p>
                       );
-                    } else if (cell.column.Header === "DETAIL") {
+                    } else if (cell.column.Header === "LINK") {
                       data = (
                         <div className="flex justify-center text-gray-700 dark:text-white">
                           <Button
@@ -317,7 +314,7 @@ const ProductTable = ({ columnsData }) => {
                             colorScheme="gray"
                             size="sm"
                           >
-                            <HiEye />
+                            <HiOutlineExternalLink />
                           </Button>
                         </div>
                       );

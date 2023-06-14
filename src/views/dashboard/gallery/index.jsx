@@ -1,9 +1,8 @@
 import React from "react";
-import Table from './component/GalleryTable'
+import Table from "./component/GalleryTable";
 
 const Gallery = () => {
-  
-   const columnDataGallery = [
+  const columnDataGallery = [
     {
       Header: "TITLE",
       accessor: "title",
@@ -15,24 +14,25 @@ const Gallery = () => {
     {
       Header: "IMAGE",
       accessor: "galleryImages",
+      disableSortBy: true,
     },
     {
       Header: "EDIT",
       accessor: "",
+      disableSortBy: true,
     },
     {
       Header: "DELETE",
       accessor: "",
+      disableSortBy: true,
     },
   ];
 
   return (
-    <div className="mt-8 bg-white rounded-full">
-      <Table
-        columnsData={columnDataGallery}
-      />
+    <div className="mt-3 rounded-full bg-white">
+      <Table columnsData={columnDataGallery} />
     </div>
-  )
+  );
 };
 
 export default Gallery;

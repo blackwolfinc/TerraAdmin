@@ -1,8 +1,7 @@
-import Table from './component/PartnerTable'
+import Table from "./component/PartnerTable";
 import React from "react";
 
 const Partners = () => {
-
   const columnDataPartner = [
     {
       Header: "IMAGE",
@@ -27,7 +26,7 @@ const Partners = () => {
   ];
 
   return (
-    <div className="mt-8 bg-white rounded-full">
+    <div className="mt-3 rounded-full bg-white">
       <Table columnsData={columnDataPartner} />
     </div>
   );
