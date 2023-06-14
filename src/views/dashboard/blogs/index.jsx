@@ -11,6 +11,7 @@ import { useUploadImagesBlogMutation } from "services/blogs/post-images-blog";
 import { convertToSlug } from "utils/convertToSlug";
 import { useEditBlogMutation } from "services/blogs/patch-blogs";
 import { useDeleteBlogMutation } from "services/blogs/delete-blogs";
+import ModalPreview from "./components/ModalPreview";
 
 const Blogs = () => {
   // state
@@ -19,6 +20,8 @@ const Blogs = () => {
   const [modalEditValue, setModalEditValue] = React.useState(null);
   const [isModalDeleteOpen, setIsModalDeleteOpen] = React.useState(false);
   const [deletedValue, setDeletedValue] = React.useState(null);
+  const [isModalPreviewOpen, setIsModalPreviewOpen] = React.useState(false);
+  const [previewValue, setPreviewValue] = React.useState(null);
 
   // API
   const { mutate: createBlog, isLoading: createBlogIsLoading } =
@@ -143,6 +146,13 @@ const Blogs = () => {
     });
   };
 
+  const handlePreview = (id) => {
+    const data = blogDataRow?.find((blog) => blog.id === id);
+    setPreviewValue(data);
+
+    setIsModalPreviewOpen(true);
+  };
+
   return (
     <>
       {/* Create New Modal */}
@@ -167,6 +177,12 @@ const Blogs = () => {
         isOpen={isModalDeleteOpen}
         onSubmit={() => handleDeleteBlog(deletedValue?.id)}
         onClose={() => setIsModalDeleteOpen(false)}
+      />
+      {/* Preview Modal */}
+      <ModalPreview
+        isOpen={isModalPreviewOpen}
+        onClose={() => setIsModalPreviewOpen(false)}
+        data={previewValue}
       />
       {/* Main */}
       <Card extra={"mt-3 w-full sm:overflow-auto p-4"}>
@@ -199,6 +215,7 @@ const Blogs = () => {
             onDetail={(id) => console.log(`Lihat detail product ${id}`)}
             onEdit={handleOpenEdit}
             onDelete={handleOpenDelete}
+            onPreview={handlePreview}
           />
         )}
       </Card>

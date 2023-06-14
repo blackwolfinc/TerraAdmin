@@ -26,8 +26,9 @@ const columnsData = [
     accessor: "createdBy",
   },
   {
+    id: "preview",
     Header: "PREVIEW",
-    accessor: "preview",
+    accessor: "id",
     disableSortBy: true,
   },
   {
@@ -49,7 +50,7 @@ const columnsData = [
   },
 ];
 
-const BlogsTable = ({ tableData, onEdit, onDelete }) => {
+const BlogsTable = ({ tableData, onEdit, onDelete, onPreview }) => {
   const columns = columnsData;
   const data = useMemo(() => tableData, [tableData]);
 
@@ -74,7 +75,7 @@ const BlogsTable = ({ tableData, onEdit, onDelete }) => {
   initialState.pageSize = 11;
 
   return (
-    <div class="h-full overflow-x-scroll xl:overflow-x-hidden">
+    <div className="h-full overflow-x-scroll xl:overflow-x-hidden">
       <table
         {...getTableProps()}
         className="w-full"
@@ -162,7 +163,7 @@ const BlogsTable = ({ tableData, onEdit, onDelete }) => {
                     data = (
                       <div className="flex justify-center text-gray-700 dark:text-white">
                         <Button
-                          onClick={() => console.log(`Lihat detail product!`)}
+                          onClick={() => onPreview(cell.value)}
                           colorScheme="gray"
                           size="sm"
                         >
