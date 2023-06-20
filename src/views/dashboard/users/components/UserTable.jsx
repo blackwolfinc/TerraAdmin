@@ -16,9 +16,15 @@ import { useCreateUserMutation } from "services/user/post-user";
 import { useUpdateUserMutation } from "services/user/put-user";
 import { toast } from "react-toastify";
 import { useDeleteUserMutation } from "services/user/delete-user";
+import Pagination from "components/pagination";
 
 const UserTable = ({ columnsData, authUser }) => {
-  const { data: fetchAllUsers, refetch: refetchAllUsers } = useUsersDataQuery();
+  const pageSize = 5;
+  const [currentPage, setCurrentPage] = React.useState(1);
+  const { data: fetchAllUsers, refetch: refetchAllUsers } = useUsersDataQuery({
+    page: currentPage,
+    paginate: pageSize,
+  });
   const { mutate: createUser } = useCreateUserMutation();
   const { mutate: updateUser } = useUpdateUserMutation();
   const { mutate: deleteUser } = useDeleteUserMutation();
@@ -254,6 +260,13 @@ const UserTable = ({ columnsData, authUser }) => {
             })}
           </tbody>
         </table>
+      </div>
+
+      <div className="mt-8 flex w-full justify-end">
+        <Pagination
+          totalPage={Math.ceil(fetchAllUsers?.data?.data?.total / pageSize)}
+          onPageChange={({ selected }) => setCurrentPage(selected + 1)}
+        />
       </div>
       <UserModal
         isOpen={isOpen}

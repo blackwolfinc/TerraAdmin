@@ -20,10 +20,16 @@ import { useUpdateProductMutation } from "services/product/put-product";
 import { useDeleteImagesProductMutation } from "services/product/delete-images-product";
 import { toast } from "react-toastify";
 import NoImage from "../../../../assets/img/no-image.jpg";
+import Pagination from "components/pagination";
 
 const ProductTable = ({ columnsData }) => {
+  const pageSize = 5;
+  const [currentPage, setCurrentPage] = React.useState(1);
   const { data: fetchAllProducts, refetch: refetchAllProducts } =
-    useProductsDataQuery();
+    useProductsDataQuery({
+      page: currentPage,
+      paginate: pageSize,
+    });
   const { mutate: createProduct } = useCreateProductMutation();
   const { mutate: updateProduct } = useUpdateProductMutation();
   const { mutate: uploadSketchProduct } = useUploadSketchProductMutation();
@@ -360,6 +366,12 @@ const ProductTable = ({ columnsData }) => {
             })}
           </tbody>
         </table>
+      </div>
+      <div className="mt-8 flex w-full justify-end">
+        <Pagination
+          totalPage={Math.ceil(fetchAllProducts?.data?.data?.total / pageSize)}
+          onPageChange={({ selected }) => setCurrentPage(selected + 1)}
+        />
       </div>
       <ProductModal
         isOpen={isOpen}

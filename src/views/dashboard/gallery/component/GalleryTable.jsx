@@ -18,10 +18,16 @@ import { useEditGalleryTitleMutation } from "services/gallery/patch-gallery-titl
 import { useDeleteGalleryMutation } from "services/gallery/delete-product";
 import { useDeleteGalleryImageMutation } from "services/gallery/delete-gallery-image-array";
 import { toast } from "react-toastify";
+import Pagination from "components/pagination";
 
 const GalleryTable = ({ columnsData }) => {
+  const pageSize = 5;
+  const [currentPage, setCurrentPage] = React.useState(1);
   const { data: galleryData, refetch: refetchShowGallery } =
-    useGalleryDataQuery();
+    useGalleryDataQuery({
+      page: currentPage,
+      paginate: pageSize,
+    });
   const { mutate: createTitle } = useCreateGalleryTitleMutation();
   const { mutate: uploadImage } = useCreateGalleryImageMutation();
   const { mutate: updateTitle } = useEditGalleryTitleMutation();
@@ -331,6 +337,12 @@ const GalleryTable = ({ columnsData }) => {
             })}
           </tbody>
         </table>
+      </div>
+      <div className="mt-8 flex w-full justify-end">
+        <Pagination
+          totalPage={Math.ceil(galleryData?.data?.data?.total / pageSize)}
+          onPageChange={({ selected }) => setCurrentPage(selected + 1)}
+        />
       </div>
       <GalleryAddEdit
         isOpen={isOpen}

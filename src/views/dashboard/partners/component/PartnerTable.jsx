@@ -17,12 +17,18 @@ import { useCreatePartnerImageMutation } from "../../../../services/partner/post
 import { useDeletePartnerMutation } from "../../../../services/partner/delete-partner";
 import { useEditPartnerMutation } from "../../../../services/partner/patch-partner";
 import { toast } from "react-toastify";
+import Pagination from "components/pagination";
 
 const PartnerTable = (props) => {
+  const pageSize = 5;
+  const [currentPage, setCurrentPage] = React.useState(1);
   const { columnsData } = props;
 
   const { data: partnerData, refetch: refetchShowPartner } =
-    usePartnerDataQuery();
+    usePartnerDataQuery({
+      page: currentPage,
+      paginate: pageSize,
+    });
 
   const { mutate: createTitle } = useCreatePartnerMutation();
   const { mutate: uploadImage } = useCreatePartnerImageMutation();
@@ -310,6 +316,12 @@ const PartnerTable = (props) => {
             })}
           </tbody>
         </table>
+      </div>
+      <div className="mt-8 flex w-full justify-end">
+        <Pagination
+          totalPage={Math.ceil(partnerData?.data?.data?.total / pageSize)}
+          onPageChange={({ selected }) => setCurrentPage(selected + 1)}
+        />
       </div>
       <PartnerAddEdit
         isOpen={isOpen}

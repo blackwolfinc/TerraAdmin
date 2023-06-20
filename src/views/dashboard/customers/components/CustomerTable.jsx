@@ -7,9 +7,15 @@ import {
 } from "react-table";
 import Card from "components/card";
 import { useCustomersDataQuery } from "services/customer/get-all-customers";
+import Pagination from "components/pagination";
 
 const CustomerTable = ({ columnsData }) => {
-  const { data: fetchAllCustomers } = useCustomersDataQuery();
+  const pageSize = 5;
+  const [currentPage, setCurrentPage] = React.useState(1);
+  const { data: fetchAllCustomers } = useCustomersDataQuery({
+    page: currentPage,
+    paginate: pageSize,
+  });
 
   const columns = React.useMemo(() => columnsData, [columnsData]);
   const data = React.useMemo(
@@ -123,6 +129,14 @@ const CustomerTable = ({ columnsData }) => {
               })}
             </tbody>
           </table>
+        </div>
+        <div className="mt-8 flex w-full justify-end">
+          <Pagination
+            totalPage={Math.ceil(
+              fetchAllCustomers?.data?.data?.total / pageSize
+            )}
+            onPageChange={({ selected }) => setCurrentPage(selected + 1)}
+          />
         </div>
       </Card>
     </div>

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import CheckTable from "./components/CheckTable";
 
 import {
