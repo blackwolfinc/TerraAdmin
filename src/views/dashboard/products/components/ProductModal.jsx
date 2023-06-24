@@ -32,6 +32,7 @@ const ProductModal = (props) => {
     description: "",
     category: "",
     specification: [""],
+    facilities: [""],
     detailProduct: "",
     productImageSlides: [],
     image_denah_path: "",
@@ -62,6 +63,9 @@ const ProductModal = (props) => {
     const newSpecification =
       value.specification.filter((item) => item !== "") || null;
 
+    const newFacilities =
+      value.facilities.filter((item) => item !== "") || null;
+
     // Regex for empty string or null or undefined
     const nonEmptyRegex = /^(?!(^$|null|undefined))/;
 
@@ -71,6 +75,7 @@ const ProductModal = (props) => {
       !nonEmptyRegex.test(value.description) ||
       !nonEmptyRegex.test(value.category) ||
       !nonEmptyRegex.test(newSpecification) ||
+      !nonEmptyRegex.test(newFacilities) ||
       !nonEmptyRegex.test(value.detailProduct) ||
       !nonEmptyRegex.test(value.productImageSlides) ||
       !nonEmptyRegex.test(value.image_denah_path)
@@ -85,6 +90,7 @@ const ProductModal = (props) => {
       description: value.description,
       category: value.category,
       specification: newSpecification,
+      facilities: newFacilities,
       detailProduct: value.detailProduct,
       productImageSlides:
         value?.productImageSlides?.filter((item) => item instanceof File) ||
@@ -199,6 +205,61 @@ const ProductModal = (props) => {
             ))}
             {isError && (
               <FormErrorMessage>Specification is required.</FormErrorMessage>
+            )}
+          </FormControl>
+          <FormControl isRequired mt={4} isInvalid={isError}>
+            <FormLabel>Facilities</FormLabel>
+            {value?.facilities?.map((textInput, index) => (
+              <Flex key={index} mt={2}>
+                <Input
+                  type="text"
+                  placeholder="Facilities"
+                  value={textInput}
+                  onChange={(e) =>
+                    setValue({
+                      ...value,
+                      facilities: [
+                        ...value.facilities.slice(0, index),
+                        e.target.value,
+                        ...value.facilities.slice(index + 1),
+                      ],
+                    })
+                  }
+                />
+                {index === value?.facilities?.length - 1 ? (
+                  <Button
+                    color="black"
+                    ml="2"
+                    onClick={() =>
+                      setValue({
+                        ...value,
+                        facilities: [...value.facilities, ""],
+                      })
+                    }
+                  >
+                    <GoPlus />
+                  </Button>
+                ) : (
+                  <Button
+                    color="red"
+                    ml="2"
+                    onClick={() =>
+                      setValue({
+                        ...value,
+                        facilities: [
+                          ...value.facilities.slice(0, index),
+                          ...value.facilities.slice(index + 1),
+                        ],
+                      })
+                    }
+                  >
+                    <MdDelete />
+                  </Button>
+                )}
+              </Flex>
+            ))}
+            {isError && (
+              <FormErrorMessage>Facilities is required.</FormErrorMessage>
             )}
           </FormControl>
           <FormControl isRequired mt={4} isInvalid={isError}>
