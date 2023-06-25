@@ -19,6 +19,7 @@ import {
   ModalCloseButton,
   FormErrorMessage,
   Select,
+  FormHelperText,
 } from "@chakra-ui/react";
 import { MdFileUpload, MdDelete } from "react-icons/md";
 import { GoPlus } from "react-icons/go";
@@ -147,7 +148,13 @@ const ProductModal = (props) => {
               name="description"
               value={value.description || ""}
               onChange={handleChange}
+              rows={"10"}
+              resize={"none"}
+              maxLength={1000}
             />
+            <FormHelperText>
+              {value.description?.length} / 1000 Characters
+            </FormHelperText>
             {isError && (
               <FormErrorMessage>Description is required.</FormErrorMessage>
             )}
