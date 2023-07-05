@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { Button } from "@chakra-ui/react";
+import { Button, Input, InputGroup, InputRightElement } from "@chakra-ui/react";
 import { MdModeEditOutline } from "react-icons/md";
 import { HiTrash, HiEye, HiOutlineExternalLink } from "react-icons/hi";
 import NoImage from "assets/img/no-image.jpg";
@@ -23,6 +23,7 @@ import {
   useTable,
 } from "react-table";
 import Pagination from "components/pagination";
+import { FiSearch } from "react-icons/fi";
 
 const columnsData = [
   {
@@ -74,6 +75,12 @@ const BlogsTable = () => {
   const [previewValue, setPreviewValue] = React.useState(null);
   const pageSize = 5;
   const [currentPage, setCurrentPage] = React.useState(1);
+  const [filter, setFilter] = React.useReducer(
+    (state, newState) => ({ ...state, ...newState }),
+    {
+      search: "",
+    }
+  );
 
   // API
   const { mutate: createBlog, isLoading: createBlogIsLoading } =
@@ -90,6 +97,7 @@ const BlogsTable = () => {
   } = useBlogDataQuery({
     page: currentPage,
     paginate: pageSize,
+    ...filter,
   });
 
   const columns = columnsData;
@@ -262,7 +270,7 @@ const BlogsTable = () => {
         data={previewValue}
       />
       <Card extra={"mt-3 w-full sm:overflow-auto p-4"}>
-        <div className="mb-4 flex items-center justify-between pb-4">
+        <div className="mb-2 flex items-center justify-between pb-4">
           <div className="text-xl font-bold text-navy-700 dark:text-white">
             LIST BLOGS
           </div>
@@ -272,6 +280,23 @@ const BlogsTable = () => {
           >
             ADD
           </button>
+        </div>
+        <div className="mb-4">
+          <InputGroup>
+            <Input
+              type="text"
+              placeholder="Search by title"
+              onBlur={(e) => setFilter({ search: e.target.value })}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  setFilter({ search: e.target.value });
+                }
+              }}
+            ></Input>
+            <InputRightElement>
+              <FiSearch />
+            </InputRightElement>
+          </InputGroup>
         </div>
         {blogsIsLoading && (
           <div className="my-4 flex items-center justify-center">
