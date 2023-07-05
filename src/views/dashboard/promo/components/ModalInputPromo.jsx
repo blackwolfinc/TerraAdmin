@@ -13,6 +13,7 @@ import {
   Textarea,
   Select,
   Spinner,
+  FormHelperText,
 } from "@chakra-ui/react";
 import { MdFileUpload } from "react-icons/md";
 
@@ -150,8 +151,13 @@ const ModalInputPromo = ({
               placeholder="Description"
               name="description"
               size="sm"
+              rows={"10"}
               resize={"none"}
+              maxLength={1000}
             />
+            <FormHelperText>
+              {value.description?.length} / 1000 Characters
+            </FormHelperText>
           </FormControl>
           <FormControl isRequired mt={4}>
             <FormLabel>Category</FormLabel>

@@ -41,4 +41,5 @@ export const API_ENDPOINT = {
   POST_IMAGE_PROMO: "/promo/image/upload/",
   //CUSTOMERS
   GET_ALL_CUSTOMERS: "/customer/",
+  DELETE_CUSTOMERS: "/customer",
 };

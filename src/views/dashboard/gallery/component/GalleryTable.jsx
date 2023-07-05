@@ -291,7 +291,7 @@ const GalleryTable = ({ columnsData }) => {
                       cell.column.Header.toUpperCase() === "DESCRIPTION"
                     ) {
                       data = (
-                        <p className="pr-14 text-sm font-semibold text-navy-700 dark:text-white">
+                        <p className="line-clamp-2 text-ellipsis pr-14 text-sm font-semibold text-navy-700 dark:text-white">
                           {cell.value}
                         </p>
                       );

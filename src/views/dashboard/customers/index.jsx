@@ -1,7 +1,10 @@
-import React from "react";
+import React, { useContext } from "react";
 import CustomerTable from "./components/CustomerTable";
+import { UserContext } from "context/UserContext";
 
 const Customers = () => {
+  const { user } = useContext(UserContext);
+
   const columnDataCustomer = [
     {
       Header: "FULLNAME",
@@ -17,9 +20,24 @@ const Customers = () => {
     },
   ];
 
+  const superadminColumns = [
+    {
+      Header: "DELETE",
+      accessor: "id",
+    },
+  ];
+
+  const getColumns = () => {
+    if (user?.role === "SUPER ADMIN") {
+      return [...columnDataCustomer, ...superadminColumns];
+    }
+
+    return columnDataCustomer;
+  };
+
   return (
     <div className="mt-3">
-      <CustomerTable columnsData={columnDataCustomer} />
+      <CustomerTable columnsData={getColumns()} />
     </div>
   );
 };

@@ -12,11 +12,6 @@ const Gallery = () => {
       accessor: "description",
     },
     {
-      Header: "IMAGE",
-      accessor: "galleryImages",
-      disableSortBy: true,
-    },
-    {
       Header: "EDIT",
       accessor: "",
       disableSortBy: true,
