@@ -6,7 +6,7 @@ import {
   useTable,
 } from "react-table";
 import Card from "components/card";
-import { Button, Image, useDisclosure } from "@chakra-ui/react";
+import { Button, Image, Input, InputGroup, InputRightElement, useDisclosure } from "@chakra-ui/react";
 import { MdModeEditOutline } from "react-icons/md";
 import { HiTrash } from "react-icons/hi";
 import GalleryAddEdit from "./GalleryAddEdit";
@@ -19,14 +19,22 @@ import { useDeleteGalleryMutation } from "services/gallery/delete-product";
 import { useDeleteGalleryImageMutation } from "services/gallery/delete-gallery-image-array";
 import { toast } from "react-toastify";
 import Pagination from "components/pagination";
+import { FiSearch } from "react-icons/fi";
 
 const GalleryTable = ({ columnsData }) => {
   const pageSize = 5;
   const [currentPage, setCurrentPage] = React.useState(1);
+  const [filter, setFilter] = React.useReducer(
+    (state, newState) => ({ ...state, ...newState }),
+    {
+      search: "",
+    }
+  );
   const { data: galleryData, refetch: refetchShowGallery } =
     useGalleryDataQuery({
       page: currentPage,
       paginate: pageSize,
+      ...filter,
     });
   const { mutate: createTitle } = useCreateGalleryTitleMutation();
   const { mutate: uploadImage } = useCreateGalleryImageMutation();
@@ -216,16 +224,36 @@ const GalleryTable = ({ columnsData }) => {
 
   return (
     <Card extra={"w-full pb-10 p-4 h-full"}>
-      <header className="relative flex items-center justify-between">
-        <div className="text-xl font-bold uppercase text-navy-700 dark:text-white">
-          List Gallery
+      <header className="relative flex flex-col items-center p-3">
+        <div className="w-full flex flex-row justify-between">
+          <div className="text-xl font-bold uppercase text-navy-700 dark:text-white">
+              List Gallery
+            </div>
+            <button
+              onClick={onOpen}
+              className="linear rounded-xl bg-brand-500 px-8 py-2 text-center text-base font-medium text-white transition duration-200 hover:bg-brand-800 active:bg-brand-700"
+            >
+              ADD
+          </button>
         </div>
-        <button
-          onClick={onOpen}
-          className="linear rounded-xl bg-brand-500 px-8 py-2 text-center text-base font-medium text-white transition duration-200 hover:bg-brand-800 active:bg-brand-700"
-        >
-          ADD
-        </button>
+        
+        <div className="w-full py-4">
+          <InputGroup>
+            <Input
+              type="text"
+              placeholder="Search by title"
+              onBlur={(e) => setFilter({ search: e.target.value })}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  setFilter({ search: e.target.value });
+                }
+              }}
+            ></Input>
+            <InputRightElement>
+              <FiSearch />
+            </InputRightElement>
+          </InputGroup>
+        </div>
       </header>
 
       <div className="mt-8 overflow-x-scroll xl:overflow-x-hidden">
