@@ -5,7 +5,16 @@ import {
   useSortBy,
   useTable,
 } from "react-table";
-import { Button, Image, Tag, TagLabel, useDisclosure } from "@chakra-ui/react";
+import {
+  Button,
+  Image,
+  Input,
+  InputGroup,
+  InputRightElement,
+  Tag,
+  TagLabel,
+  useDisclosure,
+} from "@chakra-ui/react";
 import Card from "components/card";
 import { MdModeEditOutline } from "react-icons/md";
 import { HiTrash, HiOutlineExternalLink } from "react-icons/hi";
@@ -21,21 +30,33 @@ import { useDeleteImagesProductMutation } from "services/product/delete-images-p
 import { toast } from "react-toastify";
 import NoImage from "../../../../assets/img/no-image.jpg";
 import Pagination from "components/pagination";
+import { useUploadImagesSpecMutation } from "services/product/post-images-spec";
+import { useDeleteImagesSpecMutation } from "services/product/delete-images-spec";
+import { FiSearch } from "react-icons/fi";
 
 const ProductTable = ({ columnsData }) => {
   const pageSize = 5;
   const [currentPage, setCurrentPage] = React.useState(1);
+  const [filter, setFilter] = React.useReducer(
+    (state, newState) => ({ ...state, ...newState }),
+    {
+      search: "",
+    }
+  );
   const { data: fetchAllProducts, refetch: refetchAllProducts } =
     useProductsDataQuery({
       page: currentPage,
       paginate: pageSize,
+      ...filter,
     });
   const { mutate: createProduct } = useCreateProductMutation();
   const { mutate: updateProduct } = useUpdateProductMutation();
   const { mutate: uploadSketchProduct } = useUploadSketchProductMutation();
   const { mutate: uploadImagesProduct } = useUploadImagesProductMutation();
+  const { mutate: uploadImagesSpecification } = useUploadImagesSpecMutation();
   const { mutate: deleteProduct } = useDeleteProductMutation();
   const { mutate: deleteImagesProduct } = useDeleteImagesProductMutation();
+  const { mutate: deleteImagesSpecification } = useDeleteImagesSpecMutation();
 
   const columns = React.useMemo(() => columnsData, [columnsData]);
   const data = React.useMemo(
@@ -80,6 +101,26 @@ const ProductTable = ({ columnsData }) => {
             },
             onError: (err) => {
               toast.error("Upload images product failed!");
+              reject(err);
+            },
+          }
+        );
+      });
+    };
+    const uploadImagesSpec = (response) => {
+      return new Promise((resolve, reject) => {
+        uploadImagesSpecification(
+          {
+            id: response?.data?.data?.id,
+            image: value.productSpecImages,
+          },
+          {
+            onSuccess: () => {
+              toast.success("Upload images specification success!");
+              resolve();
+            },
+            onError: (err) => {
+              toast.error("Upload images specification failed!");
               reject(err);
             },
           }
@@ -161,11 +202,24 @@ const ProductTable = ({ columnsData }) => {
                 },
               });
             }
+            if (value.deleteImagesSpec && value.deleteImagesSpec.length > 0) {
+              deleteImagesSpecification(value.deleteImagesSpec, {
+                onSuccess: () => {
+                  toast.success("Delete images specification success!");
+                },
+                onError: (err) => {
+                  toast.error("Delete images specification failed!");
+                },
+              });
+            }
+
             // For Upload Images & Sketch
             const promises = [];
             if (value.image_denah_path) promises.push(uploadSketch(response));
             if (value.productImageSlides.length > 0)
               promises.push(uploadImages(response));
+            if (value.productSpecImages.length > 0)
+              promises.push(uploadImagesSpec(response));
             if (promises.length > 0) {
               Promise.all(promises)
                 .then(() => {
@@ -227,154 +281,189 @@ const ProductTable = ({ columnsData }) => {
           ADD
         </button>
       </header>
+      <div className="mt-4">
+        <InputGroup>
+          <Input
+            type="text"
+            placeholder="Search by title"
+            onBlur={(e) => setFilter({ search: e.target.value })}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                setFilter({ search: e.target.value });
+              }
+            }}
+          ></Input>
+          <InputRightElement>
+            <FiSearch />
+          </InputRightElement>
+        </InputGroup>
+      </div>
 
-      <div className="mt-8 overflow-x-scroll xl:overflow-x-hidden">
-        <table {...getTableProps()} className="w-full">
-          <thead>
-            {headerGroups.map((headerGroup, index) => (
-              <tr {...headerGroup.getHeaderGroupProps()} key={index}>
-                {headerGroup.headers.map((column, index) => (
-                  <th
-                    {...column.getHeaderProps(column.getSortByToggleProps())}
-                    key={index}
-                    className={`${
-                      (column.Header === "CATEGORY" && "w-[200px]") ||
-                      (column.Header === "LINK" && "w-[80px]") ||
-                      (column.Header === "EDIT" && "w-[80px]") ||
-                      (column.Header === "DELETE" && "w-[80px]") ||
-                      "pr-14"
-                    } ${
-                      column.Header === "IMAGES" ? "w-[150px]" : ""
-                    } border-b border-gray-200 pb-[10px] text-start dark:!border-navy-700`}
-                  >
-                    <div
-                      className={`${
-                        column.Header === "LINK" ||
-                        column.Header === "EDIT" ||
-                        column.Header === "DELETE"
-                          ? "justify-center"
-                          : "justify-between"
-                      } flex w-full text-xs tracking-wide text-gray-600`}
-                    >
-                      {column.render("Header")}
-                    </div>
-                  </th>
-                ))}
-              </tr>
-            ))}
-          </thead>
+      {data?.length === 0 && (
+        <div className="mt-8 flex items-center justify-center">
+          <div className="text-lg font-bold text-gray-400">
+            Product Not Found
+          </div>
+        </div>
+      )}
 
-          <tbody {...getTableBodyProps()}>
-            {page.map((row, index) => {
-              prepareRow(row);
-              return (
-                <tr {...row.getRowProps()} key={index}>
-                  {row.cells.map((cell, index) => {
-                    let data;
-                    if (cell.column.Header === "IMAGES") {
-                      data = (
-                        <p className="pr-14 text-sm font-semibold text-navy-700 dark:text-white">
-                          <Image
-                            boxSize="4rem"
-                            objectFit="cover"
-                            src={
-                              cell?.value[0]
-                                ? `${process.env.REACT_APP_API_IMAGE}/${cell?.value[0]?.image_path}`
-                                : NoImage
-                            }
-                            alt={`image-${index}`}
-                          />
-                        </p>
-                      );
-                    } else if (cell.column.Header === "TITLE") {
-                      data = (
-                        <p className="pr-14 text-sm font-bold text-navy-700 dark:text-white">
-                          {cell.value}
-                        </p>
-                      );
-                    } else if (cell.column.Header === "CATEGORY") {
-                      data = (
-                        <p className="pr-14 text-sm font-semibold text-navy-700 dark:text-white">
-                          <Tag
-                            size="sm"
-                            borderRadius="full"
-                            variant="solid"
-                            colorScheme={
-                              (cell.value === "BIG_SALE" && "red") ||
-                              (cell.value === "SUPER_DEAL" && "blue") ||
-                              (cell.value === "STANDARD" && "yellow")
-                            }
-                          >
-                            <TagLabel>{cell.value}</TagLabel>
-                          </Tag>
-                        </p>
-                      );
-                    } else if (cell.column.Header === "LINK") {
-                      data = (
-                        <div className="flex justify-center text-gray-700 dark:text-white">
-                          <Button
-                            onClick={() =>
-                              window.open(
-                                `/product/${cell.row.original.id}`,
-                                "_blank"
-                              )
-                            }
-                            colorScheme="gray"
-                            size="sm"
-                          >
-                            <HiOutlineExternalLink />
-                          </Button>
-                        </div>
-                      );
-                    } else if (cell.column.Header === "EDIT") {
-                      data = (
-                        <div className="flex justify-center text-gray-900 dark:text-white">
-                          <Button
-                            colorScheme="purple"
-                            size="sm"
-                            onClick={() => handleEditProduct(cell.row.original)}
-                          >
-                            <MdModeEditOutline />
-                          </Button>
-                        </div>
-                      );
-                    } else if (cell.column.Header === "DELETE") {
-                      data = (
-                        <div className="flex justify-center text-red-500 dark:text-white">
-                          <Button
-                            colorScheme="red"
-                            size="sm"
-                            onClick={() =>
-                              handleDeleteProduct(cell.row.original)
-                            }
-                          >
-                            <HiTrash />
-                          </Button>
-                        </div>
-                      );
-                    }
-                    return (
-                      <td
-                        className="pb-[10px] pt-[10px] sm:text-[14px]"
-                        {...cell.getCellProps()}
+      {data?.length > 0 && (
+        <div>
+          <div className="mt-8 overflow-x-scroll xl:overflow-x-hidden">
+            <table {...getTableProps()} className="w-full">
+              <thead>
+                {headerGroups.map((headerGroup, index) => (
+                  <tr {...headerGroup.getHeaderGroupProps()} key={index}>
+                    {headerGroup.headers.map((column, index) => (
+                      <th
+                        {...column.getHeaderProps(
+                          column.getSortByToggleProps()
+                        )}
                         key={index}
+                        className={`${
+                          (column.Header === "CATEGORY" && "w-[200px]") ||
+                          (column.Header === "LINK" && "w-[80px]") ||
+                          (column.Header === "EDIT" && "w-[80px]") ||
+                          (column.Header === "DELETE" && "w-[80px]") ||
+                          "pr-14"
+                        } ${
+                          column.Header === "IMAGES" ? "w-[150px]" : ""
+                        } border-b border-gray-200 pb-[10px] text-start dark:!border-navy-700`}
                       >
-                        {data}
-                      </td>
-                    );
-                  })}
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-      <div className="mt-8 flex w-full justify-end">
-        <Pagination
-          totalPage={Math.ceil(fetchAllProducts?.data?.data?.total / pageSize)}
-          onPageChange={({ selected }) => setCurrentPage(selected + 1)}
-        />
-      </div>
+                        <div
+                          className={`${
+                            column.Header === "LINK" ||
+                            column.Header === "EDIT" ||
+                            column.Header === "DELETE"
+                              ? "justify-center"
+                              : "justify-between"
+                          } flex w-full text-xs tracking-wide text-gray-600`}
+                        >
+                          {column.render("Header")}
+                        </div>
+                      </th>
+                    ))}
+                  </tr>
+                ))}
+              </thead>
+
+              <tbody {...getTableBodyProps()}>
+                {page.map((row, index) => {
+                  prepareRow(row);
+                  return (
+                    <tr {...row.getRowProps()} key={index}>
+                      {row.cells.map((cell, index) => {
+                        let data;
+                        if (cell.column.Header === "IMAGES") {
+                          data = (
+                            <p className="pr-14 text-sm font-semibold text-navy-700 dark:text-white">
+                              <Image
+                                boxSize="4rem"
+                                objectFit="cover"
+                                src={
+                                  cell?.value[0]
+                                    ? `${process.env.REACT_APP_API_IMAGE}/${cell?.value[0]?.image_path}`
+                                    : NoImage
+                                }
+                                alt={`image-${index}`}
+                              />
+                            </p>
+                          );
+                        } else if (cell.column.Header === "TITLE") {
+                          data = (
+                            <p className="pr-14 text-sm font-bold text-navy-700 dark:text-white">
+                              {cell.value}
+                            </p>
+                          );
+                        } else if (cell.column.Header === "CATEGORY") {
+                          data = (
+                            <p className="pr-14 text-sm font-semibold text-navy-700 dark:text-white">
+                              <Tag
+                                size="sm"
+                                borderRadius="full"
+                                variant="solid"
+                                colorScheme={
+                                  (cell.value === "BIG_SALE" && "red") ||
+                                  (cell.value === "SUPER_DEAL" && "blue") ||
+                                  (cell.value === "STANDARD" && "yellow")
+                                }
+                              >
+                                <TagLabel>{cell.value}</TagLabel>
+                              </Tag>
+                            </p>
+                          );
+                        } else if (cell.column.Header === "LINK") {
+                          data = (
+                            <div className="flex justify-center text-gray-700 dark:text-white">
+                              <Button
+                                onClick={() =>
+                                  window.open(
+                                    `/product/${cell.row.original.id}`,
+                                    "_blank"
+                                  )
+                                }
+                                colorScheme="gray"
+                                size="sm"
+                              >
+                                <HiOutlineExternalLink />
+                              </Button>
+                            </div>
+                          );
+                        } else if (cell.column.Header === "EDIT") {
+                          data = (
+                            <div className="flex justify-center text-gray-900 dark:text-white">
+                              <Button
+                                colorScheme="purple"
+                                size="sm"
+                                onClick={() =>
+                                  handleEditProduct(cell.row.original)
+                                }
+                              >
+                                <MdModeEditOutline />
+                              </Button>
+                            </div>
+                          );
+                        } else if (cell.column.Header === "DELETE") {
+                          data = (
+                            <div className="flex justify-center text-red-500 dark:text-white">
+                              <Button
+                                colorScheme="red"
+                                size="sm"
+                                onClick={() =>
+                                  handleDeleteProduct(cell.row.original)
+                                }
+                              >
+                                <HiTrash />
+                              </Button>
+                            </div>
+                          );
+                        }
+                        return (
+                          <td
+                            className="pb-[10px] pt-[10px] sm:text-[14px]"
+                            {...cell.getCellProps()}
+                            key={index}
+                          >
+                            {data}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          <div className="mt-8 flex w-full justify-end">
+            <Pagination
+              totalPage={Math.ceil(
+                fetchAllProducts?.data?.data?.total / pageSize
+              )}
+              onPageChange={({ selected }) => setCurrentPage(selected + 1)}
+            />
+          </div>
+        </div>
+      )}
       <ProductModal
         isOpen={isOpen}
         onClose={onClose}
