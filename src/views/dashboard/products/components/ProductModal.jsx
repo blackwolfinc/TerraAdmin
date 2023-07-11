@@ -19,7 +19,6 @@ import {
   ModalCloseButton,
   FormErrorMessage,
   Select,
-  FormHelperText,
 } from "@chakra-ui/react";
 import { MdFileUpload, MdDelete } from "react-icons/md";
 import { GoPlus } from "react-icons/go";
@@ -36,6 +35,7 @@ const ProductModal = (props) => {
     facilities: [""],
     detailProduct: "",
     productImageSlides: [],
+    productSpecImages: [],
     image_denah_path: "",
   };
 
@@ -79,6 +79,7 @@ const ProductModal = (props) => {
       !nonEmptyRegex.test(newFacilities) ||
       !nonEmptyRegex.test(value.detailProduct) ||
       !nonEmptyRegex.test(value.productImageSlides) ||
+      !nonEmptyRegex.test(value.productSpecImages) ||
       !nonEmptyRegex.test(value.image_denah_path)
     ) {
       setIsError(true);
@@ -96,10 +97,18 @@ const ProductModal = (props) => {
       productImageSlides:
         value?.productImageSlides?.filter((item) => item instanceof File) ||
         null,
+      productSpecImages:
+        value?.productSpecImages?.filter((item) => item instanceof File) ||
+        null,
       image_denah_path:
         value?.image_denah_path instanceof File ? value.image_denah_path : null,
       deleteImages:
         value?.deleteImages
+          ?.filter((item) => item.id !== undefined)
+          .map((item) => item.id)
+          .join(",") || null,
+      deleteImagesSpec:
+        value?.deleteImagesSpec
           ?.filter((item) => item.id !== undefined)
           .map((item) => item.id)
           .join(",") || null,
@@ -148,13 +157,7 @@ const ProductModal = (props) => {
               name="description"
               value={value.description || ""}
               onChange={handleChange}
-              rows={"10"}
-              resize={"none"}
-              maxLength={1000}
             />
-            <FormHelperText>
-              {value.description?.length} / 1000 Characters
-            </FormHelperText>
             {isError && (
               <FormErrorMessage>Description is required.</FormErrorMessage>
             )}
@@ -212,6 +215,94 @@ const ProductModal = (props) => {
             ))}
             {isError && (
               <FormErrorMessage>Specification is required.</FormErrorMessage>
+            )}
+          </FormControl>
+          <FormControl isRequired mt={4} isInvalid={isError}>
+            <FormLabel>Images Specification</FormLabel>
+            <Box
+              className="col-span-5 h-full w-full rounded-xl bg-lightPrimary dark:!bg-navy-700 2xl:col-span-6"
+              borderWidth={isError ? "2px" : "0px"}
+              borderColor="red"
+              p={4}
+            >
+              <label
+                htmlFor="spec-images-upload"
+                className="flex h-full w-full flex-col items-center justify-center rounded-xl border-[2px] border-dashed border-gray-200 py-3 dark:!border-navy-700 lg:pb-0"
+              >
+                <MdFileUpload className="text-[80px] text-brand-300 dark:text-white" />
+                <Text className="text-xl font-bold text-brand-300 dark:text-white">
+                  Upload Files
+                </Text>
+                <Text className="mt-2 text-sm font-medium text-gray-600">
+                  PNG, JPG and JPEG files are allowed (Max 2MB)
+                </Text>
+                <input
+                  id="spec-images-upload"
+                  type="file"
+                  accept="image/"
+                  onChange={(e) =>
+                    setValue({
+                      ...value,
+                      productSpecImages: [
+                        ...value.productSpecImages,
+                        ...Array.from(e.target.files),
+                      ],
+                    })
+                  }
+                  multiple
+                  className="hidden"
+                />
+              </label>
+              <Stack mt={4} spacing={2}>
+                {value?.productSpecImages?.map((file, index) => (
+                  <Box
+                    key={file.name || index}
+                    borderWidth="2px"
+                    borderRadius="xl"
+                    p={2}
+                    display="flex"
+                    alignItems="center"
+                  >
+                    <Image
+                      src={
+                        file instanceof File
+                          ? URL.createObjectURL(file)
+                          : `${process.env.REACT_APP_API_IMAGE}/${file.image_path}`
+                      }
+                      alt="Preview"
+                      maxH="80px"
+                      maxW="80px"
+                      mr={2}
+                    />
+                    <Text fontSize="sm">
+                      {file.image_path ? file.image_path : file.name}
+                    </Text>
+                    <Button
+                      colorScheme="red"
+                      size="sm"
+                      onClick={() =>
+                        setValue((prevValue) => ({
+                          ...prevValue,
+                          productSpecImages: prevValue.productSpecImages.filter(
+                            (selectedFile) => selectedFile !== file
+                          ),
+                          deleteImagesSpec: prevValue.deleteImagesSpec
+                            ? [...prevValue.deleteImagesSpec, file]
+                            : [file],
+                        }))
+                      }
+                      ml="auto"
+                    >
+                      <MdDelete />
+                    </Button>
+                  </Box>
+                ))}
+              </Stack>
+            </Box>
+            {isError && (
+              <FormErrorMessage>
+                Product Specification Images are required.
+              </FormErrorMessage>
             )}
           </FormControl>
           <FormControl isRequired mt={4} isInvalid={isError}>
@@ -298,7 +389,7 @@ const ProductModal = (props) => {
             )}
           </FormControl>
           <FormControl isRequired mt={4} isInvalid={isError}>
-            <FormLabel>Images</FormLabel>
+            <FormLabel>Images Product</FormLabel>
             <Box
               className="col-span-5 h-full w-full rounded-xl bg-lightPrimary dark:!bg-navy-700 2xl:col-span-6"
               borderWidth={isError ? "2px" : "0px"}
@@ -360,14 +451,6 @@ const ProductModal = (props) => {
                     <Button
                       colorScheme="red"
                       size="sm"
-                      // onClick={() =>
-                      //   setValue({
-                      //     ...value,
-                      //     productImageSlides: value.productImageSlides.filter(
-                      //       (selectedFile) => selectedFile !== file
-                      //     ),
-                      //   })
-                      // }
                       onClick={() =>
                         setValue((prevValue) => ({
                           ...prevValue,
