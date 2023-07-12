@@ -143,6 +143,7 @@ const BlogsTable = () => {
       slug: convertToSlug(data.title),
       description: "Blog Description",
       body: data.body,
+      category: data.category,
     };
 
     createBlog(postData, {
@@ -190,6 +191,7 @@ const BlogsTable = () => {
       slug: convertToSlug(data.title),
       description: "Blog Description",
       body: data.body,
+      category: data.category,
     };
 
     editBlog(

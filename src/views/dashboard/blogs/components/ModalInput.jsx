@@ -8,10 +8,12 @@ import {
   ModalBody,
   ModalFooter,
   Spinner,
+  Select,
 } from "@chakra-ui/react";
 import { MdFileUpload } from "react-icons/md";
 import InputField from "components/fields/InputField";
 import Quill from "components/quill";
+import BlogCategoryData from "data/blogs-category.json";
 
 const ModalInput = ({
   title = "Create New Blog",
@@ -40,6 +42,7 @@ const ModalInput = ({
         title: initialValue?.title || "",
         image: initialValue?.image || "",
         body: initialValue?.body || "",
+        category: initialValue?.category || "",
       });
     }
   }, [initialValue, isOpen]);
@@ -47,6 +50,7 @@ const ModalInput = ({
   const clear = () => {
     setValue({
       title: "",
+      category: "",
       image: "",
       body: "",
     });
@@ -82,6 +86,32 @@ const ModalInput = ({
             value={value.title}
             onChange={(e) => setValue({ title: e.target.value })}
           />
+          <div className="mb-3">
+            <label
+              htmlFor="category"
+              className="mb-3 ml-1.5 block text-sm font-medium"
+            >
+              Category
+            </label>
+            <Select
+              id="category"
+              placeholder="Select Category"
+              required
+              value={value.category}
+              onChange={(e) => {
+                setValue({ category: e.target.value });
+              }}
+            >
+              {BlogCategoryData?.map((cat, i) => {
+                console.log("Selected Category", value.category === cat);
+                return (
+                  <option key={`category-${i}`} value={cat}>
+                    {cat}
+                  </option>
+                );
+              })}
+            </Select>
+          </div>
           <label className="group mb-4 flex aspect-video h-40 cursor-pointer flex-col items-center justify-center rounded-xl border-[2px] border-dashed border-gray-200 dark:!border-navy-700 lg:pb-0">
             <div className="relative h-full w-full">
               {value.image && (
@@ -132,7 +162,11 @@ const ModalInput = ({
                 if (onSubmit) onSubmit(value);
               }}
               disabled={
-                isLoading || !value.title || !value.image || !value.body
+                isLoading ||
+                !value.title ||
+                !value.image ||
+                !value.body ||
+                !value.category
               }
               className="rounded-xl bg-brand-500 px-5 py-3 text-sm font-medium text-white transition duration-200 hover:bg-brand-600 active:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-brand-400 dark:text-white dark:hover:bg-brand-300 dark:active:bg-brand-200"
             >
